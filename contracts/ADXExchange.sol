@@ -13,6 +13,8 @@ contract ADXExchange is Ownable {
 	mapping (address => mapping (bytes32 => Bid)) bidsByAdvertiser; // bids set out by advertisers
 	mapping (address => mapping (bytes32 => Bid)) bidsByPublisher; // accepted by publisher
 
+	uint execTimeHardCap = 60 days; // if a bid is not executed within 60 days, it can be canceled to unlock the ADX
+
 	enum BidState { 
 		Open, 
 		Accepted, // in progress
