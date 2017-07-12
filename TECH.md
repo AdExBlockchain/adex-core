@@ -79,7 +79,7 @@ As with the publisher portal, advertisers will be encouraged to self-host the po
 
 # User targeting
 
-The user targeting algorithm is public and is ran entirely on the client side, so as to keep personal user data only in the user's browser. This has the added penalty of having to pull information about multiple ads direclty on the client side, and then make the selection. We believe this is not an issue: since bids are accepted manually, and publishers/advertisers have control over who they work with, we expect no more than couple of hundred of different ads (at most!) are going to be in contension for one impression. Pulling targeting metadata about, for example, 300 different ad units, is not a challenging task for modern internet conenctions (even slow ones), and the selection algorithm itself is not anything heavy either.
+The user targeting algorithm is public and is ran entirely on the client side, so as to keep personal user data only in the user's browser. This has the added overhead of having to pull information about multiple ads directly on the client side, and then make the selection. We believe this is not an issue: since bids are accepted manually, and publishers/advertisers have control over who they work with, we expect no more than couple of hundred of different ads (at most!) are going to be in contension for one impression. Pulling targeting metadata about, for example, 300 different ad units, is not a challenging task for modern internet conenctions (even slow ones), and the selection algorithm itself is not anything heavy either.
 
 Of course, the ad selection algorithm is a yet another thing that can be customized in AdEx, besides giving you control of which bids you accept in the first place.
 
