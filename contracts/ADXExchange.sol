@@ -44,8 +44,7 @@ contract ADXExchange is Ownable {
 
 		// Requirements
 		uint requiredGoals;
-		uint requiredAcceptTime; // XXX: do we need this? advertisers can give up the bids themslevs is state is Open
-		uint requiredExecTime;
+		uint requiredExecTime; // if the bid is not executed within that time, it can be canceled
 
 		// margin of error against the state channel (append-only stats DB)
 		// a min threshold for that is good, but better protect the users from themselves in the dapp rather than the SC
