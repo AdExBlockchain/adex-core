@@ -15,3 +15,8 @@ yarn install
 yarn test
 
 ```
+
+## Documentation
+
+- [ADXRegistry](/docs/docs.md)
+- [ADXExchange](/docs/exchange.md)
