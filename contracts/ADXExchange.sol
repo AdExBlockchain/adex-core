@@ -73,9 +73,12 @@ contract ADXExchange is Ownable, Drainable {
 		uint requiredExecTime; // essentially a timeout
 
 		// Results
-		// XXX consider adding publisherSummary/advertiserSummary
 		bool confirmedByPublisher;
 		bool confirmedByAdvertiser;
+
+		// IPFS links to result reports 
+		bytes32 publisherReportIpfs;
+		bytes32 advertiserReportIpfs;
 	}
 
 	//
@@ -233,7 +236,7 @@ contract ADXExchange is Ownable, Drainable {
 	}
 
 	// both publisher and advertiser have to call this for a bid to be considered verified
-	function verifyBid(uint _bidId)
+	function verifyBid(uint _bidId, bytes32 _report)
 		onlyRegisteredAcc
 		onlyExistingBid(_bidId)
 		onlyBidState(_bidId, BidState.Accepted)
@@ -242,11 +245,19 @@ contract ADXExchange is Ownable, Drainable {
 
 		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
 
-		if (bid.publisher == msg.sender) bid.confirmedByPublisher = true;
-		if (bid.advertiser == msg.sender) bid.confirmedByAdvertiser = true;
+		if (bid.publisher == msg.sender) {
+			bid.confirmedByPublisher = true;
+			bid.publisherReportIpfs = _report;
+		}
+
+		if (bid.advertiser == msg.sender) {
+			bid.confirmedByAdvertiser = true;
+			bid.advertiserReportIpfs = _report;
+		}
+
 		if (bid.confirmedByAdvertiser && bid.confirmedByPublisher) {
 			bid.state = BidState.Completed;
-			LogBidCompleted(bid.id);
+			LogBidCompleted(bid.id, bid.advertiserReportIpfs, bid.publisherReportIpfs);
 		}
 	}
 
@@ -352,18 +363,31 @@ contract ADXExchange is Ownable, Drainable {
 		external
 		returns (
 			uint, uint, uint, uint, uint, 
-			//only ad slot, ad unit; and peers everything else can be retrieved via the registry
+			// advertiser (ad unit, ipfs, peer)
 			uint, bytes32, bytes32,
+			// publisher (ad slot, ipfs, peer)
 			uint, bytes32, bytes32
 		)
 	{
-		// TODO: others
 		var bid = bidsById[_bidId];
 		return (
 			uint(bid.state), bid.requiredPoints, bid.requiredExecTime, bid.amount, bid.acceptedTime,
 			bid.adUnit, bid.adUnitIpfs, bid.advertiserPeer,
 			bid.adSlot, bid.adSlotIpfs, bid.publisherPeer
 		);
+	}
+
+	function getBidReports(uint _bidId)
+		onlyExistingBid(_bidId)
+		constant
+		external
+		returns (
+			bytes32, // advertiser report
+			bytes32 // publisher report
+		)
+	{
+		var bid = bidsById[_bidId];
+		return (bid.advertiserReportIpfs, bid.publisherReportIpfs);
 	}
 
 	//
@@ -373,7 +397,7 @@ contract ADXExchange is Ownable, Drainable {
 	event LogBidAccepted(uint bidId, address publisher, uint adslotId, bytes32 adslotIpfs, uint acceptedTime, bytes32 publisherPeer);
 	event LogBidCanceled(uint bidId);
 	event LogBidExpired(uint bidId);
-	event LogBidCompleted(uint bidId);
+	event LogBidCompleted(uint bidId, bytes32 advReport, bytes32 pubReport);
 	event LogBidRewardClaimed(uint _bidId, address _wallet, uint _amount);
 }
 

@@ -13,6 +13,9 @@ contract('ADXExchange', function(accounts) {
 
 	var SIG = 0x420000000000000002300023400022000000000000000000000000000000000
 
+	var bidTwoAdvReportAddr = 0x3300000000000000000000000000000000000000000000000000000000000000
+	var bidTwoPubReportAddr = 0x3400000000000000000000000000000000000000000000000000000000000000
+
 	var ADUNIT = 0 
 	var ADSLOT = 1
 
@@ -287,7 +290,7 @@ contract('ADXExchange', function(accounts) {
 
 	it("advertiser can NOT verify the bid before it's accepted", function() {
 		return new Promise((resolve, reject) => {
-			adxExchange.verifyBid(2, { from: accTwo, gas: 400000 })
+			adxExchange.verifyBid(2, bidTwoAdvReportAddr, { from: accTwo, gas: 400000 })
 			.catch((err) => {
 				assert.equal(err.message, 'VM Exception while processing transaction: invalid opcode')
 				resolve()
@@ -394,7 +397,7 @@ contract('ADXExchange', function(accounts) {
 
 	it("non-publisher/advertiser can NOT verify the bid", function() {
 		return new Promise((resolve, reject) => {
-			adxExchange.verifyBid(2, { from: accOne, gas: 400000 })
+			adxExchange.verifyBid(2, bidTwoPubReportAddr, { from: accOne, gas: 400000 })
 			.catch((err) => {
 				assert.equal(err.message, 'VM Exception while processing transaction: invalid opcode')
 				resolve()
@@ -404,7 +407,7 @@ contract('ADXExchange', function(accounts) {
 	})
 
 	it("publisher can verify the bid", function() {
-		return adxExchange.verifyBid(2, { from: accThree, gas: 400000 })
+		return adxExchange.verifyBid(2, bidTwoPubReportAddr, { from: accThree, gas: 400000 })
 	})
 
 	it("can NOT claim bid reward before it's FULLY verified (advertiser + publisher)", function() {
@@ -418,12 +421,14 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
-	it("advertiser can verified the bid", function() {
-		return adxExchange.verifyBid(2, { from: accTwo, gas: 400000 })
+	it("advertiser can verify the bid", function() {
+		return adxExchange.verifyBid(2, bidTwoAdvReportAddr, { from: accTwo, gas: 400000 })
 		.then(function(res) {
 			var ev = res.logs[0]
 			if (! ev) throw 'no event'
 			assert.equal(ev.event, 'LogBidCompleted')
+			assert.equal(ev.args.pubReport, web3.toHex(bidTwoPubReportAddr))
+			assert.equal(ev.args.advReport, web3.toHex(bidTwoAdvReportAddr))
 		})
 	})
 
@@ -686,6 +691,16 @@ contract('ADXExchange', function(accounts) {
 			assert.equal(res[8], adslotId)
 			assert.equal(res[9], '0x4821000000000000000000000000000000000000000000000000000000000000')
 			assert.equal(web3.toUtf8(res[10]), 'https://publisher.com/peer')
+		})
+	})
+
+
+	// get single bids
+	it("get a single bid - reports", function() {
+		return adxExchange.getBidReports(2)
+		.then(function(res) {
+			assert.equal(res[0], web3.toHex(bidTwoAdvReportAddr))
+			assert.equal(res[1], web3.toHex(bidTwoPubReportAddr))
 		})
 	})
 })
