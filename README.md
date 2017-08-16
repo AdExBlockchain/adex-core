@@ -16,6 +16,12 @@ yarn test
 
 ```
 
+## NEO Port
+
+This repository, namely the ADXRegistry and ADXExchange smart contracts will be ported the [NEO Smart Economy](https://neo.org) (see [Smart Contract docs](http://docs.neo.org/en-us/sc/introduction.html)). We consider NEO to be a great alternative to Ethereum because of the smart contract system that allows more stable languages such as C# to be used for writing smart contracts, and the general engineering direction of the project.
+
+The AdEx Core will still be available and maintained for Ethereum.
+
 ## Documentation
 
 - [ADXRegistry](/docs/docs.md)
