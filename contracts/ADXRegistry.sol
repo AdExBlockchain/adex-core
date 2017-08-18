@@ -75,8 +75,8 @@ contract ADXRegistry is Ownable, Drainable {
 		if (!isNew) require(acc.signature == _sig);
 		acc.signature = _sig;
 
-		if (isNew) LogAccountRegistered(acc.addr, acc.wallet, acc.ipfs, acc.name, acc.meta);
-		else LogAccountModified(acc.addr, acc.wallet, acc.ipfs, acc.name, acc.meta);
+		if (isNew) LogAccountRegistered(acc.addr, acc.wallet, acc.ipfs, acc.name, acc.meta, acc.signature);
+		else LogAccountModified(acc.addr, acc.wallet, acc.ipfs, acc.name, acc.meta, acc.signature);
 	}
 
 	// use _id = 0 to create a new item, otherwise modify existing
@@ -171,8 +171,8 @@ contract ADXRegistry is Ownable, Drainable {
 	}
 
 	// Events
-	event LogAccountRegistered(address addr, address wallet, bytes32 ipfs, bytes32 name, bytes32 meta);
-	event LogAccountModified(address addr, address wallet, bytes32 ipfs, bytes32 name, bytes32 meta);
+	event LogAccountRegistered(address addr, address wallet, bytes32 ipfs, bytes32 name, bytes32 meta, bytes32 signature);
+	event LogAccountModified(address addr, address wallet, bytes32 ipfs, bytes32 name, bytes32 meta, bytes32 signature);
 	
 	event LogItemRegistered(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 name, bytes32 meta);
 	event LogItemModified(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 name, bytes32 meta);

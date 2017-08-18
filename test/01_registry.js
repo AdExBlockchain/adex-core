@@ -12,7 +12,7 @@ contract('ADXRegistry', function(accounts) {
 
 	var adxRegistry 
 
-	var SIG = 0x420000000000000002300023400022000000000000000000000000000000000
+	var SIG = 0x4200000000000000023000234000220000000000000000000000000000000000
 
 	it("initialize contract", function() {
 		return ADXRegistry.new().then(function(_adxRegistry) {
@@ -80,6 +80,7 @@ contract('ADXRegistry', function(accounts) {
 			assert.equal(ev.args.ipfs, '0x4700000000000000000000000000000000000000000000000000000000000000');
 			assert.equal(ev.args.wallet, wallet)
 			assert.equal(web3.toUtf8(ev.args.meta), '{}')
+			assert.equal(ev.args.signature, web3.toHex(SIG))
 		})
 	})
 
@@ -103,6 +104,7 @@ contract('ADXRegistry', function(accounts) {
 			assert.equal(ev.args.ipfs, '0x4200000000000000000000000000000000000000000000000000000000000000')
 			assert.equal(ev.args.wallet, wallet)
 			assert.equal(web3.toUtf8(ev.args.meta), '{ "email": "office@strem.io" }')
+			assert.equal(ev.args.signature, web3.toHex(SIG))
 		})
 	})
 
