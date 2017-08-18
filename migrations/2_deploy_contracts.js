@@ -1,10 +1,5 @@
-var ConvertLib = artifacts.require("./ConvertLib.sol");
-var MetaCoin = artifacts.require("./MetaCoin.sol");
-var greeter = artifacts.require("./greeter.sol");
+var ADXRegistry = artifacts.require("./ADXRegistry.sol");
+var ADXExchange = artifacts.require("./ADXExchange.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(ConvertLib);
-  deployer.link(ConvertLib, MetaCoin);
-  deployer.deploy(MetaCoin);
-  deployer.deploy(greeter);
 };

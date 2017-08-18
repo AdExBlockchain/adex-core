@@ -17,7 +17,7 @@ We call the critical set of smart contracts that facilitate the most important i
 * ADXExchange: handles the bidding, bid accept/execute, payment processes; once a bid has been accepted, it locks the ADX tokens until both publisher and advertiser have successfully confirmed the execution of the bid, after which it unlocks the ADX tokens and transfers them to the publisher
 
 ## Possible additions:
-* ADXToken2 (ADXT): an upgradable ERC20 token with an inflation model designed to improve the token's scalability and avoid too much scarcity 
+* ADXToken2 (ADXT): an upgradable ERC20 token with an inflation model designed to improve the token's scalability and avoid too much scarcity; the migration to this token will happen seamlessly - both would be usable in the core, but the token contract will allow buying ADXT with the old ADX token, so that the token will be upgraded voluntarily 
 
 
 ## The AdEx core versioning scheme is as follows:

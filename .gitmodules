@@ -1,3 +1,6 @@
 [submodule "zeppelin-solidity"]
 	path = zeppelin-solidity
 	url = https://github.com/OpenZeppelin/zeppelin-solidity
+[submodule "adex-token"]
+	path = adex-token
+	url = https://github.com/AdExBlockchain/adex-token
