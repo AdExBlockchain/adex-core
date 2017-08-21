@@ -66,14 +66,15 @@ contract ADXRegistry is Ownable, Drainable {
 		var isNew = accounts[msg.sender].addr == 0;
 
 		var acc = accounts[msg.sender];
+
+		if (!isNew) require(acc.signature == _sig);
+		else acc.signature = _sig;
+
 		acc.addr = msg.sender;
 		acc.wallet = _wallet;
 		acc.ipfs = _ipfs;
 		acc.name = _name;
 		acc.meta = _meta;
-
-		if (!isNew) require(acc.signature == _sig);
-		acc.signature = _sig;
 
 		if (isNew) LogAccountRegistered(acc.addr, acc.wallet, acc.ipfs, acc.name, acc.meta, acc.signature);
 		else LogAccountModified(acc.addr, acc.wallet, acc.ipfs, acc.name, acc.meta, acc.signature);
@@ -86,7 +87,9 @@ contract ADXRegistry is Ownable, Drainable {
 		// XXX _type sanity check?
 		var item = items[_type][_id];
 
-		if (_id == 0) {
+		if (_id != 0)
+			require(item.owner == msg.sender);
+		else {
 			// XXX: what about overflow here?
 			var newId = ++counts[_type];
 
@@ -97,8 +100,6 @@ contract ADXRegistry is Ownable, Drainable {
 
 			accounts[msg.sender].items[_type].push(item.id);
 		}
-
-		require(item.owner == msg.sender);
 
 		item.name = _name;
 		item.meta = _meta;
