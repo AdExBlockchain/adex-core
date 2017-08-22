@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/Ivshti/adex-core.git"
+    "url": "git+ssh://git@github.com/AdExBlockchain/adex-core.git"
   },
   "author": "Ivo Georgiev <ivo@linvo.com> (http://ivogeorgiev.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Ivshti/stremio-adex-proto/issues"
+    "url": "https://github.com/AdExBlockchain/adex-core/issues"
   },
-  "homepage": "https://github.com/Ivshti/stremio-adex-proto#readme",
+  "homepage": "https://github.com/AdExBlockchain/adex-core#readme",
   "dependencies": {
     "bluebird": "^3.5.0"
   },
