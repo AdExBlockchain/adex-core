@@ -7,7 +7,8 @@ In the browser, the user generates an identity (if they don't have one) and they
 	timestamp: 1501944407916,
 	url: "https://app.strem.io/#movies",
 	bidId: 233
-}```
+}
+```
 
 This gets signed by the user identity and sent to the publisher endpoint AND to the advertiser endpoint.
 
@@ -33,7 +34,8 @@ The message that gets written ends up looking like:
 		sig: <user signature> 
 	},
 	sig: <publisher/advertiser signature>
-}```
+}
+```
 
 The publisher and advertiser are responsible keeping track of each other's data and signalling to the smart contract when the bid is considered completed.
 
