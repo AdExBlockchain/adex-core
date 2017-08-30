@@ -76,7 +76,7 @@ contract('ADXRegistry', function(accounts) {
 			if (! ev) throw 'no event'
 			assert.equal(ev.event, 'LogAccountRegistered')
 			assert.equal(ev.args.addr, accOne)
-			assert.equal(web3.toUtf8(ev.args.name), 'stremio')
+			assert.equal(web3.toUtf8(ev.args.accountName), 'stremio')
 			assert.equal(ev.args.ipfs, '0x4700000000000000000000000000000000000000000000000000000000000000');
 			assert.equal(ev.args.wallet, wallet)
 			assert.equal(web3.toUtf8(ev.args.meta), '{}')
@@ -100,7 +100,7 @@ contract('ADXRegistry', function(accounts) {
 			if (! ev) throw 'no event'
 			assert.equal(ev.event, 'LogAccountModified')
 			assert.equal(ev.args.addr, accOne)
-			assert.equal(web3.toUtf8(ev.args.name), 'stremio')
+			assert.equal(web3.toUtf8(ev.args.accountName), 'stremio')
 			assert.equal(ev.args.ipfs, '0x4200000000000000000000000000000000000000000000000000000000000000')
 			assert.equal(ev.args.wallet, wallet)
 			assert.equal(web3.toUtf8(ev.args.meta), '{ "email": "office@strem.io" }')
@@ -132,7 +132,7 @@ contract('ADXRegistry', function(accounts) {
 			assert.equal(ev.event, 'LogItemRegistered')
 			assert.equal(ev.args.itemType, ADUNIT);
 			assert.equal(ev.args.id, 1)
-			assert.equal(web3.toUtf8(ev.args.name), 'foobar ad unit')
+			assert.equal(web3.toUtf8(ev.args.itemName), 'foobar ad unit')
 			assert.equal(web3.toUtf8(ev.args.meta), '{}')
 			assert.equal(ev.args.ipfs, '0x4200000000000000000000000000000000000000000000000000000000000000');
 			assert.equal(ev.args.owner, accOne)
@@ -151,7 +151,7 @@ contract('ADXRegistry', function(accounts) {
 			if (! ev) throw 'no event'
 			assert.equal(ev.event, 'LogItemModified')
 			assert.equal(ev.args.itemType, ADUNIT);
-			assert.equal(web3.toUtf8(ev.args.name), 'foobar campaign')
+			assert.equal(web3.toUtf8(ev.args.itemName), 'foobar campaign')
 			assert.equal(web3.toUtf8(ev.args.meta), "{ someMeta: 's' }")
 			assert.equal(ev.args.ipfs, '0x4500000000000000000000000000000000000000000000000000000000000000');
 			assert.equal(ev.args.id.toNumber(), adunitId)

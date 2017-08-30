@@ -67,7 +67,7 @@ contract('ADXExchange', function(accounts) {
 			if (! ev) throw 'no event'
 			assert.equal(ev.event, 'LogAccountRegistered')
 			assert.equal(ev.args.addr, accTwo)
-			assert.equal(web3.toUtf8(ev.args.name), 'vyperCola')
+			assert.equal(web3.toUtf8(ev.args.accountName), 'vyperCola')
 			assert.equal(ev.args.ipfs, '0x5700000000000000000000000000000000000000000000000000000000000000');
 			assert.equal(ev.args.wallet, advWallet)
 			assert.equal(web3.toUtf8(ev.args.meta), '{}')
@@ -98,7 +98,7 @@ contract('ADXExchange', function(accounts) {
 			assert.equal(ev.event, 'LogItemRegistered')
 			assert.equal(ev.args.itemType, ADUNIT);
 			assert.equal(ev.args.id, 1)
-			assert.equal(web3.toUtf8(ev.args.name), 'foobar ad unit')
+			assert.equal(web3.toUtf8(ev.args.itemName), 'foobar ad unit')
 			assert.equal(web3.toUtf8(ev.args.meta), '{}')
 			assert.equal(ev.args.ipfs, '0x4820000000000000000000000000000000000000000000000000000000000000');
 			assert.equal(ev.args.owner, accTwo)
@@ -123,7 +123,7 @@ contract('ADXExchange', function(accounts) {
 			assert.equal(ev.event, 'LogItemRegistered')
 			assert.equal(ev.args.itemType, ADSLOT);
 			assert.equal(ev.args.id, 1)
-			assert.equal(web3.toUtf8(ev.args.name), 'foobar ad slot')
+			assert.equal(web3.toUtf8(ev.args.itemName), 'foobar ad slot')
 			assert.equal(web3.toUtf8(ev.args.meta), '{}')
 			assert.equal(ev.args.ipfs, '0x4821000000000000000000000000000000000000000000000000000000000000');
 			assert.equal(ev.args.owner, accThree)

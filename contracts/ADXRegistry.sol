@@ -172,9 +172,9 @@ contract ADXRegistry is Ownable, Drainable {
 	}
 
 	// Events
-	event LogAccountRegistered(address addr, address wallet, bytes32 ipfs, bytes32 name, bytes32 meta, bytes32 signature);
-	event LogAccountModified(address addr, address wallet, bytes32 ipfs, bytes32 name, bytes32 meta, bytes32 signature);
+	event LogAccountRegistered(address addr, address wallet, bytes32 ipfs, bytes32 accountName, bytes32 meta, bytes32 signature);
+	event LogAccountModified(address addr, address wallet, bytes32 ipfs, bytes32 accountName, bytes32 meta, bytes32 signature);
 	
-	event LogItemRegistered(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 name, bytes32 meta);
-	event LogItemModified(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 name, bytes32 meta);
+	event LogItemRegistered(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 itemName, bytes32 meta);
+	event LogItemModified(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 itemName, bytes32 meta);
 }
