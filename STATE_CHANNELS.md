@@ -77,11 +77,14 @@ The private keys for users are kept in their browser in `localStorage`. They are
 ## FAQ 
 
 Q: Why is reporting data kept in scuttlebutt/redis and not on the blockchain
+
 A: Reporting data - individual impressions, clicks and events in general - is too big and time-critical to be kept on the blockchain 
 
 Q: Doesn't that make the reporting data manipulatable?
+
 A: The user sends the same events to the publisher node and the advertiser node, so you get the reporting data as it's generated from the user; if one of the parties tries to manipulate the data, the other party will not agree with them and therefore they will not reach an agreement on the blockchain (call the `verifyBid()` on `ADXExchange`)
 
 Q: How is agreement being reached?
+
 A: The publisher and advertiser nodes each monitor their own reporting data in relation to every bid. Each party will call the `verifyBid()` function on the `ADXExchange` smart contract, when it sees that the agreed-upon target of clicks is reached in their own data feed. Once both of them do that, the smart contract will release the bid reward from escrow and allow the publisher to withdraw it.
 
