@@ -4,7 +4,7 @@
 
 # Overview
 
-The core philosophy of AdEx is it's balanced/correct use of blockchain. The AdEx Network only uses the blockchain for mission-critical data, such as accomplished conversion goals and payment. That way, it eliminates the ability for froad and lack of transparency when it comes to the critical things, therefore eliminating the incentive to manipulate statistics, which will be kept off-chain to allow for great volumes of analytics data.
+The core philosophy of AdEx is it's balanced/correct use of blockchain. The AdEx Network only uses the blockchain for mission-critical data, such as accomplished conversion goals and payment. That way, it eliminates the ability for fraud and lack of transparency when it comes to the critical things, therefore eliminating the incentive to manipulate statistics, which will be kept off-chain to allow for great volumes of analytics data.
 
 We call the critical set of smart contracts that facilitate the most important interactions between publishers, users and advertisers the "AdEx Core". The AdEx Core will be kept small and highly modular, to mitigate the possibility and impact of potential bugs in smart contracts.
 
