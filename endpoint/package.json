@@ -1,7 +1,7 @@
 {
   "name": "adex-endpoint",
   "version": "1.0.0",
-  "description": "AdEx HTTP endpoint that users/publishers/advertisers connect to the AdEx Core",
+  "description": "AdEx HTTP endpoint that acts as a bridge/helper to the AdEx Core",
   "main": "index.js",
   "scripts": {
     "test": "tape test/*"
