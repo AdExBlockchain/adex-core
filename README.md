@@ -5,7 +5,7 @@ This repository contains the Ethereum-based core of the AdEx Network. This inclu
 ## Instructions
 
 ```
-git clone --recursive https://github.com/Ivshti/adex-core
+git clone --recursive https://github.com/AdExBlockchain/adex-core
 cd adex-core
 
 # if you missed --recursive for some reason :)
