@@ -2,7 +2,8 @@
 # AdEx State channels:
 
 In the browser, the user generates an identity (if they don't have one) and they generate an event looking like:
-```{
+```
+{
 	type: "impression",
 	timestamp: 1501944407916,
 	url: "https://app.strem.io/#movies",
@@ -13,7 +14,8 @@ In the browser, the user generates an identity (if they don't have one) and they
 This gets signed by the user identity and sent to the publisher endpoint AND to the advertiser endpoint.
 
 Example:
-```{
+```
+{
 	data: { type: "impression" .... },
 	sig: <user signature>
 }
@@ -28,7 +30,8 @@ Both of them:
 The user signature is already contained in the message body sent to the publisher/advertiser.
 
 The message that gets written ends up looking like:
-```{
+```
+{
 	data: { 
 		data: { type: "impression", ... }, 
 		sig: <user signature> 
