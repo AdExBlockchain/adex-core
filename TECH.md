@@ -154,7 +154,8 @@ Possible factors for gaining points include:
 
 * Number of publishers have confirmed this user achieved conversion goals
 * Advertisers confirmed this user as a user with a unique IP
-* A trusted authority confirmed the legitimacy of this user
+* A trusted authority confirmed the legitimacy of this user through the client-side SDK
+* The user solved a captcha shown by the client-side SDK (only once per every cryptographic identity)
 
 Every advertiser will be able to set a minimum threshold of user legitimacy before a conversion goal is being counted.
 
