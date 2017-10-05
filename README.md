@@ -24,5 +24,5 @@ The AdEx Core will still be available and maintained for Ethereum.
 
 ## Documentation
 
-- [ADXRegistry](/docs/docs.md)
+- [ADXRegistry](/docs/registry.md)
 - [ADXExchange](/docs/exchange.md)
