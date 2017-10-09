@@ -30,8 +30,6 @@ contract ADXExchange is Ownable, Drainable {
 	uint constant ADUNIT = 0;
 	uint constant ADSLOT = 1;
 
-	uint execTimeHardCap = 60 days; // if a bid is not executed within 60 days, it can be canceled to unlock the ADX
-
 	enum BidState { 
 		Open, 
 		Accepted, // in progress
