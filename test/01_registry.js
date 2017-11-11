@@ -7,10 +7,10 @@ contract('ADXRegistry', function(accounts) {
 	var accOne = web3.eth.accounts[0]
 	var wallet = web3.eth.accounts[8]
 
-	var ADUNIT = 0 
+	var ADUNIT = 0
 	var PROPERTY = 1
 
-	var adxRegistry 
+	var adxRegistry
 
 	var SIG = 0x4200000000000000023000234000220000000000000000000000000000000000
 
@@ -86,7 +86,7 @@ contract('ADXRegistry', function(accounts) {
 
 	it("account is registered", function() {
 		return adxRegistry.isRegistered(accOne)
-		.then(function(isReg) { 
+		.then(function(isReg) {
 			assert.equal(isReg, true)
 		})
 	})
@@ -167,7 +167,7 @@ contract('ADXRegistry', function(accounts) {
 				assert.equal(err.message, 'VM Exception while processing transaction: invalid opcode')
 				resolve()
 			})
-			.then(function() { reject('cant be here - unexpected success') })	
+			.then(function() { reject('cant be here - unexpected success') })
 		})
 	})
 
@@ -176,7 +176,7 @@ contract('ADXRegistry', function(accounts) {
 	// can drain ether: can't test that, because we can't send ether in the first place...
 	// maybe figure out a way to test it?
 
-	// TODO: all the *get methods 
+	// TODO: all the *get methods
 	// also test if they are callable for non-registered accounts
 
 	it("can get an account, account meta correct", function() {
