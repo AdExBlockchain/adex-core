@@ -62,6 +62,8 @@ contract ADXRegistry is Ownable, Drainable {
 	{
 		require(_wallet != 0);
 		// XXX should we ensure _sig is not 0? if so, also add test
+		
+		require(_name != 0);
 
 		var isNew = accounts[msg.sender].addr == 0;
 
