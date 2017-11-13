@@ -176,7 +176,7 @@ contract ADXExchange is Ownable, Drainable {
 		onlyBidOwner(_bidId)
 		onlyBidState(_bidId, BidState.Open)
 	{
-		var bid = bidsById[_bidId];
+		Bid storage bid = bidsById[_bidId];
 		bid.state = BidState.Canceled;
 		token.transfer(bid.advertiserWallet, bid.amount);
 
@@ -199,7 +199,7 @@ contract ADXExchange is Ownable, Drainable {
 
 		require(publisher == msg.sender);
 
-		var bid = bidsById[_bidId];
+		Bid storage bid = bidsById[_bidId];
 
 		// should not happen when bid.state is BidState.Open, but just in case
 		require(bid.publisher == 0);
@@ -242,7 +242,7 @@ contract ADXExchange is Ownable, Drainable {
 		onlyExistingBid(_bidId)
 		onlyBidState(_bidId, BidState.Accepted)
 	{
-		var bid = bidsById[_bidId];
+		Bid storage bid = bidsById[_bidId];
 
 		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
 
@@ -270,7 +270,7 @@ contract ADXExchange is Ownable, Drainable {
 		onlyBidAceptee(_bidId)
 		onlyBidState(_bidId, BidState.Completed)
 	{
-		var bid = bidsById[_bidId];
+		Bid storage bid = bidsById[_bidId];
 		
 		bid.state = BidState.Claimed;
 
@@ -287,7 +287,7 @@ contract ADXExchange is Ownable, Drainable {
 		onlyBidOwner(_bidId)
 		onlyBidState(_bidId, BidState.Accepted)
 	{
-		var bid = bidsById[_bidId];
+		Bid storage bid = bidsById[_bidId];
 		require(bid.requiredExecTime > 0); // you can't refund if you haven't set a timeout
 		require(SafeMath.add(bid.acceptedTime, bid.requiredExecTime) < now);
 
