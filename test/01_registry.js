@@ -59,6 +59,19 @@ contract('ADXRegistry', function(accounts) {
 			.then(function() { reject('cant be here - unexpected success') })
 		})
 	})
+	
+	it("can't register as account with a blank name", function() {
+		return new Promise((resolve, reject) => {
+			adxRegistry.register("", wallet, 0x47, SIG, "{}", {
+				from: accOne,
+				gas: 180000
+			}).catch((err) => {
+				assert.equal(err.message, 'VM Exception while processing transaction: invalid opcode')
+				resolve()
+			})
+			.then(function() { reject('cant be here - unexpected success') })
+		})
+	});
 
 	it("account not registered", function() {
 		return adxRegistry.isRegistered(accOne)
