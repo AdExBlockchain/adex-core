@@ -164,7 +164,7 @@ contract ADXExchange is Ownable, Drainable {
 		bidsById[bid.id] = bid;
 		bidsByAdunit[_adunitId].push(bid.id);
 
-		token.transferFrom(advertiserWallet, address(this), _rewardAmount);
+		require(token.transferFrom(advertiserWallet, address(this), _rewardAmount));
 
 		LogBidOpened(bid.id, advertiser, _adunitId, adIpfs, _target, _rewardAmount, _timeout, _peer);
 	}
