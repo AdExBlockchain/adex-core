@@ -111,11 +111,6 @@ contract ADXExchange is Ownable, Drainable {
 		_;
 	}
 
-	modifier unonlyExistingBid(uint _bidId) {
-		require(bidsById[_bidId].id == 0);
-		_;
-	}
-
 	// Functions
 
 	function ADXExchange(address _token, address _registry)
@@ -178,7 +173,7 @@ contract ADXExchange is Ownable, Drainable {
 	{
 		Bid storage bid = bidsById[_bidId];
 		bid.state = BidState.Canceled;
-		token.transfer(bid.advertiserWallet, bid.amount);
+		require(token.transfer(bid.advertiserWallet, bid.amount));
 
 		LogBidCanceled(bid.id);
 	}
@@ -231,7 +226,7 @@ contract ADXExchange is Ownable, Drainable {
 	{
 		var bid = bidsById[_bidId];
 		bid.state = BidState.Canceled;
-		token.transfer(bid.advertiserWallet, bid.amount);
+		require(token.transfer(bid.advertiserWallet, bid.amount));
 
 		LogBidCanceled(bid.id);
 	}
