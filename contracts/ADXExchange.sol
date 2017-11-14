@@ -111,11 +111,6 @@ contract ADXExchange is Ownable, Drainable {
 		_;
 	}
 
-	modifier unonlyExistingBid(uint _bidId) {
-		require(bidsById[_bidId].id == 0);
-		_;
-	}
-
 	// Functions
 
 	function ADXExchange(address _token, address _registry)
