@@ -13,8 +13,7 @@ listFiles() {
 }
 
 #echo "pragma solidity ^0.4.15;"
-listFiles $1 | xargs egrep -h "^pragma solidity" | head -n1
-echo ""
+egrep -h "^pragma solidity" $1 | head -n1
 
 listFiles $1 | awk '!x[$0]++' | while read line; do
 	cat $line | egrep -v "^(pragma solidity |import )" 
