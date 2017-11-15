@@ -9,10 +9,10 @@ import "./ADXRegistry.sol";
 contract ADXExchange is Ownable, Drainable {
 	string public name = "AdEx Exchange";
 
-	ERC20 token;
-	ADXRegistry registry;
+	ERC20 public token;
+	ADXRegistry public registry;
 
-	uint bidsCount;
+	uint public bidsCount;
 
 	mapping (uint => Bid) bidsById;
 	mapping (uint => uint[]) bidsByAdunit; // bids set out by ad unit
