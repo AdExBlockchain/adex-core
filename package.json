@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/AdExBlockchain/adex-core#readme",
   "dependencies": {
-    "bluebird": "^3.5.0"
+    "bluebird": "^3.5.0",
+    "solc": "^0.4.15"
   },
   "devDependencies": {
     "truffle": "*"

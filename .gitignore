@@ -1,3 +1,4 @@
+build-contract/*
 build/*
 node_modules
 package-*.json
