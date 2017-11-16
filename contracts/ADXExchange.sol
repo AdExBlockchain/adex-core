@@ -269,7 +269,7 @@ contract ADXExchange is Ownable, Drainable {
 		
 		bid.state = BidState.Claimed;
 
-		token.transfer(bid.publisherWallet, bid.amount);
+		require(token.transfer(bid.publisherWallet, bid.amount));
 
 		LogBidRewardClaimed(bid.id, bid.publisherWallet, bid.amount);
 	}
@@ -287,7 +287,7 @@ contract ADXExchange is Ownable, Drainable {
 		require(SafeMath.add(bid.acceptedTime, bid.requiredExecTime) < now);
 
 		bid.state = BidState.Expired;
-		token.transfer(bid.advertiserWallet, bid.amount);
+		require(token.transfer(bid.advertiserWallet, bid.amount));
 
 		LogBidExpired(bid.id);
 	}
