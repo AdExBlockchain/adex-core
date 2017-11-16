@@ -2,12 +2,12 @@
 
 mkdir -p build-contract/{bundled,final}
 
-if [ -z "`which solcjs`" ];
-then
+#if [ -z "`which solcjs`" ];
+#then
 	function solcjs() {
 		./node_modules/solc/solcjs $@
 	}
-fi
+#fi
 
 # NOTE: the bundled thing has to be on the top level, at least while building... because of the way solcjs relativizes the paths
 ls contracts/ADX*.sol | while read line
