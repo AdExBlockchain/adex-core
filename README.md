@@ -16,6 +16,14 @@ yarn test
 
 ```
 
+## Components in mainnet
+
+``adex-token.eth`` - ERC20 token of AdEx
+
+``adex-registry.eth`` - the registry contract of AdEx - handles accounts, ad units, ad slots and others
+
+``adex-exchange.eth`` - the on-chain advertising exchange
+
 ## NEO Port
 
 This repository, namely the ADXRegistry and ADXExchange smart contracts will be ported the [NEO Smart Economy](https://neo.org) (see [Smart Contract docs](http://docs.neo.org/en-us/sc/introduction.html)). We consider NEO to be a great alternative to Ethereum because of the smart contract system that allows more stable languages such as C# to be used for writing smart contracts, and the general engineering direction of the project.
