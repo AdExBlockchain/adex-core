@@ -10,6 +10,8 @@ contract ADXExchange is Ownable, Drainable {
 
 	ERC20 public token;
 
+	// TODO: ADXExchangeInterface
+
 	// TODO: the function to withdraw tokens should not allow to withdraw on-exchange balance
 
 	// TODO balanceOf function
@@ -61,8 +63,8 @@ contract ADXExchange is Ownable, Drainable {
 		// Requirements
 
 		//RequirementType type;
-		uint requiredPoints; // how many impressions/clicks/conversions have to be done
-		uint requiredExecTime; // essentially a timeout
+		uint target; // how many impressions/clicks/conversions have to be done
+		uint timeout;
 
 		// Confirmations from both sides; any value other than 0 is vconsidered as confirm, but this should usually be an IPFS hash to a final report
 		bytes32 publisherConfirmation;
@@ -100,24 +102,29 @@ contract ADXExchange is Ownable, Drainable {
 	// 
 
 	// the bid is accepted by the publisher
-	function acceptBid(bytes32 _adunit, address _advertiser, bytes32 _adslot, uint _target, uint _rewardAmount, uint _timeout, bytes32 _msg)
-	//onlyBidAcceptee
+	function acceptBid(address _advertiser, bytes32 _adunit, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, bytes32 v, bytes32 s, bytes32 r)
 	{
 
 		// TODO: Require: we verify the advertiser sig 
 		// TODO; we verify advertiser's balance and we lock it down
 
-		require(publisher == msg.sender);
+		bytes32 hash = keccak256(_advertiser, _adunit, _target, _rewardAmount, _timeout, nonce, this);
 
-		Bid memory bid;
+		Bid storage bid = bidsById[hash];
+		require(bid.state == 0); // bidStates[hash] == 0
+
+
+		require(didSign(advertiser, hash, v, s, r));
+		require(publisher == msg.sender);
 
 		//bid.id = ++bidsCount; // start from 1, so that 0 is not a valid ID
 		bid.state = BidState.Accepted;
 
+
+		bid.target = _target;
 		bid.amount = _rewardAmount;
 
-		bid.requiredPoints = _target;
-		bid.requiredExecTime = _timeout;
+		bid.timeout = _timeout;
 
 		bid.advertiser = advertiser;
 		bid.adUnit = _adunit;
@@ -155,8 +162,8 @@ contract ADXExchange is Ownable, Drainable {
 		onlyBidState(_bidId, BidState.Accepted)
 	{
 		Bid storage bid = bids[_bidId];
-		require(bid.requiredExecTime > 0); // you can't refund if you haven't set a timeout
-		require(SafeMath.add(bid.acceptedTime, bid.requiredExecTime) < now);
+		require(bid.timeout > 0); // you can't refund if you haven't set a timeout
+		require(SafeMath.add(bid.acceptedTime, bid.timeout) < now);
 
 		bid.state = BidState.Expired;
 
@@ -197,6 +204,14 @@ contract ADXExchange is Ownable, Drainable {
 		}
 	}
 
+
+	// Internal helpers
+	function didSign(address addr, bytes32 hash, uint8 v, bytes32 r, bytes32 s) 
+		internal pure returns (bool) 
+	{
+		return ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash), v, r, s) == addr;
+	}
+
 	//
 	// Public constant functions
 	//
@@ -213,7 +228,7 @@ contract ADXExchange is Ownable, Drainable {
 	{
 		var bid = bids[_bidId];
 		return (
-			uint(bid.state), bid.requiredPoints, bid.requiredExecTime, bid.amount, bid.acceptedTime,
+			uint(bid.state), bid.target, bid.timeout, bid.amount, bid.acceptedTime,
 			bid.advertiser, bid.adUnit, bid.advertiserConfirmation,
 			bid.publisher, bid.adSlot, bid.publisherConfrimation
 		);
@@ -225,7 +240,7 @@ contract ADXExchange is Ownable, Drainable {
 	//
 
 	// TODO
-	event LogBidAccepted(uint bidId, address publisher, uint adslotId, bytes32 adslotIpfs, uint acceptedTime, bytes32 publisherPeer);
+	event LogBidAccepted(uint bidId, address publisher, uint adslotId, bytes32 adslotIpfs, uint acceptedTime);
 
 	event LogBidCanceled(uint bidId);
 	event LogBidExpired(uint bidId);
