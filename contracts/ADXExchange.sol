@@ -13,8 +13,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 	// TODO: ensure every func mutates bid state and emits an event
 
-	// TODO: the function to withdraw tokens should not allow to withdraw on-exchange balance
-
  	mapping (address => uint) balances;
 
  	// escrowed on bids
@@ -112,9 +110,8 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		require(didSign(advertiser, hash, v, s, r));
 		require(publisher == msg.sender);
 
-		require(balances[advertiser] >= _rewardAmount);
-
-		bidStates[bidId] = BidState.Accepted;
+		uint avail = SafeMath.sub(balances[advertiser], onBids[advertiser]);
+		require(avail >= _rewardAmount);
 
 		bid.target = _target;
 		bid.amount = _rewardAmount;
@@ -129,11 +126,14 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 		bids[bidId] = bid;
 
+		bidStates[bidId] = BidState.Accepted;
+
 		onBids[advertiser] += _rewardAmount;
 
+		// static analysis?
 		// require(onBids[advertiser] <= balances[advertiser]);
 
-		LogBidAccepted(bidId, publisher, _slotId, adSlotIpfs, bid.acceptedTime, bid.publisherPeer);
+		LogBidAccepted(bidId, advertiser, _adunit, publisher, _adslot, bid.acceptedTime);
 	}
 
 	// The bid is canceled by the advertiser or the publisher
@@ -199,8 +199,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 			balances[bid.advertiser] -= bid.amount;
 			balances[bid.publisher] += bid.amount;
 
-			// TODO: switch balances
-
 			LogBidCompleted(_bidId, bid.advertiserConfirmation, bid.publisherConfrimation);
 		}
 	}
@@ -264,8 +262,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	// Events
 	//
 
-	// TODO
-	event LogBidAccepted(uint bidId, address publisher, uint adslotId, bytes32 adslotIpfs, uint acceptedTime);
+	event LogBidAccepted(uint bidId, address advertiser, bytes32 adunit, address publisher, bytes32 adslot, uint acceptedTime);
 
 	event LogBidCanceled(uint bidId);
 	event LogBidExpired(uint bidId);

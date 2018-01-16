@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 contract ADXExchangeInterface {
 	// events
-	event LogBidAccepted(uint bidId, address publisher, uint adslotId, bytes32 adslotIpfs, uint acceptedTime);
+	event LogBidAccepted(uint bidId, address advertiser, bytes32 adunit, address publisher, bytes32 adslot, uint acceptedTime);
 	event LogBidCanceled(uint bidId);
 	event LogBidExpired(uint bidId);
 	event LogBidCompleted(uint bidId, bytes32 advReport, bytes32 pubReport);
