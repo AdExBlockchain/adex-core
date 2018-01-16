@@ -194,9 +194,9 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		if (bid.advertiserConfirmation && bid.publisherConfrimation) {
 			bidStates[_bidId] = BidState.Completed;
 
-			onBids[bid.advertiser] -= bid.amount;
-			balances[bid.advertiser] -= bid.amount;
-			balances[bid.publisher] += bid.amount;
+			onBids[bid.advertiser] = SafeMath.sub(onBids[bid.advertiser], bid.amount);
+			balances[bid.advertiser] = SafeMath.sub(balances[bid.advertiser], bid.amount);
+			balances[bid.publisher] = SafeMath.add(balances[bid.publisher], bid.amount);
 
 			LogBidCompleted(_bidId, bid.advertiserConfirmation, bid.publisherConfrimation);
 		}
