@@ -21,6 +21,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
  	mapping (address => uint) onBids; 
 
 	mapping (bytes32 => Bid) bids;
+	mapping (bytes32 => BidState) bidStates;
 
 	// TODO: some properties in the bid structure - achievedPoints/peers for example - are not used atm
 	
@@ -43,8 +44,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	}
 
 	struct Bid {
-		BidState state;
-
 		// ADX reward amount
 		uint amount;
 
@@ -84,7 +83,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 	modifier onlyBidState(uint _bidId, BidState _state) {
 		require(bids[_bidId].id != 0);
-		require(bids[_bidId].state == _state);
+		require(bidStates[_bidId] == _state);
 		_;
 	}
 
@@ -108,14 +107,13 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 		bytes32 bidId = keccak256(_advertiser, _adunit, _target, _rewardAmount, _timeout, nonce, this);
 
-		Bid storage bid = bidsById[hash];
-		require(bid.state == 0); // bidStates[hash] == 0
-
+		Bid storage bid = bidsById[bidId];
+		require(bidStates[bidId] == 0);
 
 		require(didSign(advertiser, hash, v, s, r));
 		require(publisher == msg.sender);
 
-		bid.state = BidState.Accepted;
+		bidStates[bidId] = BidState.Accepted;
 
 		bid.target = _target;
 		bid.amount = _rewardAmount;
@@ -161,7 +159,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		require(bid.timeout > 0); // you can't refund if you haven't set a timeout
 		require(SafeMath.add(bid.acceptedTime, bid.timeout) < now);
 
-		bid.state = BidState.Expired;
+		bidStates[bidId] = BidState.Expired;
 
 		onBids[bid.advertiser] -= bid.amount;
 
@@ -189,19 +187,21 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		}
 
 		if (bid.advertiserConfirmation && bid.publisherConfrimation) {
-			bid.state = BidState.Completed;
+			bidStates[_bidId] = BidState.Completed;
 
 			onBids[bid.advertiser] -= bid.amount;
 			balances[bid.advertiser] -= bid.amount;
 			balances[bid.publisher] += bid.amount;
 
 			// TODO: switch balances
-			
+
 			LogBidCompleted(_bidId, bid.advertiserConfirmation, bid.publisherConfrimation);
 		}
 	}
 
+	//
 	// Internal helpers
+	//
 	function didSign(address addr, bytes32 hash, uint8 v, bytes32 r, bytes32 s) 
 		internal pure returns (bool) 
 	{
@@ -224,7 +224,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	{
 		var bid = bids[_bidId];
 		return (
-			uint(bid.state), bid.target, bid.timeout, bid.amount, bid.acceptedTime,
+			uint(bidStates[_bidId]), bid.target, bid.timeout, bid.amount, bid.acceptedTime,
 			bid.advertiser, bid.adUnit, bid.advertiserConfirmation,
 			bid.publisher, bid.adSlot, bid.publisherConfrimation
 		);
