@@ -138,7 +138,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 	// The bid is canceled by the advertiser or the publisher
 	function cancelBid(uint _bidId)
-		onlyBidState(_bidId, BidState.Accepted)
 	{
 		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
 
