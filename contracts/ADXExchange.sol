@@ -1,20 +1,19 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 import "../zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./helpers/Drainable.sol";
+import "./ADXExchangeInterface.sol";
 import "../zeppelin-solidity/contracts/token/ERC20.sol";
 
-contract ADXExchange is Ownable, Drainable {
+contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	string public name = "AdEx Exchange";
 
 	ERC20 public token;
 
-	// TODO: ADXExchangeInterface
+	// TODO: ensure every func mutates bid state and emits an event
 
 	// TODO: the function to withdraw tokens should not allow to withdraw on-exchange balance
-
-	// TODO balanceOf function
 
  	mapping (address => uint) balances;
 
@@ -44,7 +43,6 @@ contract ADXExchange is Ownable, Drainable {
 	}
 
 	struct Bid {
-		uint id;
 		BidState state;
 
 		// ADX reward amount
@@ -108,7 +106,7 @@ contract ADXExchange is Ownable, Drainable {
 		// TODO: Require: we verify the advertiser sig 
 		// TODO; we verify advertiser's balance and we lock it down
 
-		bytes32 hash = keccak256(_advertiser, _adunit, _target, _rewardAmount, _timeout, nonce, this);
+		bytes32 bidId = keccak256(_advertiser, _adunit, _target, _rewardAmount, _timeout, nonce, this);
 
 		Bid storage bid = bidsById[hash];
 		require(bid.state == 0); // bidStates[hash] == 0
@@ -117,9 +115,7 @@ contract ADXExchange is Ownable, Drainable {
 		require(didSign(advertiser, hash, v, s, r));
 		require(publisher == msg.sender);
 
-		//bid.id = ++bidsCount; // start from 1, so that 0 is not a valid ID
 		bid.state = BidState.Accepted;
-
 
 		bid.target = _target;
 		bid.amount = _rewardAmount;
@@ -138,7 +134,7 @@ contract ADXExchange is Ownable, Drainable {
 		require(token.transferFrom(advertiserWallet, address(this), _rewardAmount));
 
 		// TODO: more things here
-		LogBidAccepted(bid.id, publisher, _slotId, adSlotIpfs, bid.acceptedTime, bid.publisherPeer);
+		LogBidAccepted(bidId, publisher, _slotId, adSlotIpfs, bid.acceptedTime, bid.publisherPeer);
 
 	}
 
@@ -146,17 +142,17 @@ contract ADXExchange is Ownable, Drainable {
 	// TODO: merge this and giveupBid
 	function cancelBid(uint _bidId)
 		onlyBidState(_bidId, BidState.Accepted)
-
 	{
-		// TODO; this would have to cehck the same way as acceptBid()
 		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
 
+		// TODO: if the bid is not accepted, allow only the advertiser to cancel it
+		// if it's accepted, allow only the publisher to cancel it
 	}
 
 
 	// This can be done if a bid is accepted, but expired
 	// This is essentially the protection from never settling on verification, or from publisher not executing the bid within a reasonable time
-	function refundBid(uint _bidId)
+	function refundBid(bytes32 _bidId)
 		onlyRegisteredAcc
 		onlyBidOwner(_bidId)
 		onlyBidState(_bidId, BidState.Accepted)
@@ -169,7 +165,7 @@ contract ADXExchange is Ownable, Drainable {
 
 		onBids[bid.advertiser] -= bid.amount;
 
-		LogBidExpired(bid.id);
+		LogBidExpired(_bidId);
 	}
 
 
@@ -200,10 +196,10 @@ contract ADXExchange is Ownable, Drainable {
 			balances[bid.publisher] += bid.amount;
 
 			// TODO: switch balances
-			LogBidCompleted(bid.id, bid.advertiserConfirmation, bid.publisherConfrimation);
+			
+			LogBidCompleted(_bidId, bid.advertiserConfirmation, bid.publisherConfrimation);
 		}
 	}
-
 
 	// Internal helpers
 	function didSign(address addr, bytes32 hash, uint8 v, bytes32 r, bytes32 s) 
@@ -234,6 +230,13 @@ contract ADXExchange is Ownable, Drainable {
 		);
 	}
 
+	function getBalance(address _user)
+		constant
+		external
+		returns (uint, uint)
+	{
+		return (balances[_user], onBids[_user]);
+	}
 
 	//
 	// Events
