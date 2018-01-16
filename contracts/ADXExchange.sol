@@ -71,12 +71,12 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	//
 	// MODIFIERS
 	//
-	modifier onlyBidOwner(uint _bidId) {
+	modifier onlyBidAdvertiser(uint _bidId) {
 		require(msg.sender == bids[_bidId].advertiser);
 		_;
 	}
 
-	modifier onlyBidAceptee(uint _bidId) {
+	modifier onlyBidPublisher(uint _bidId) {
 		require(msg.sender == bids[_bidId].publisher);
 		_;
 	}
@@ -101,7 +101,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	// the bid is accepted by the publisher
 	function acceptBid(address _advertiser, bytes32 _adunit, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, bytes32 v, bytes32 s, bytes32 r)
 	{
-
 		// TODO: Require: we verify the advertiser sig 
 		// TODO; we verify advertiser's balance and we lock it down
 
@@ -112,6 +111,8 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 		require(didSign(advertiser, hash, v, s, r));
 		require(publisher == msg.sender);
+
+		require(balances[advertiser] >= _rewardAmount);
 
 		bidStates[bidId] = BidState.Accepted;
 
@@ -129,30 +130,36 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		bids[bidId] = bid;
 
 		onBids[advertiser] += _rewardAmount;
-		require(token.transferFrom(advertiserWallet, address(this), _rewardAmount));
 
-		// TODO: more things here
+		// require(onBids[advertiser] <= balances[advertiser]);
+
 		LogBidAccepted(bidId, publisher, _slotId, adSlotIpfs, bid.acceptedTime, bid.publisherPeer);
-
 	}
 
-	// the bid is canceled by the advertiser
-	// TODO: merge this and giveupBid
+	// The bid is canceled by the advertiser or the publisher
 	function cancelBid(uint _bidId)
 		onlyBidState(_bidId, BidState.Accepted)
 	{
 		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
 
-		// TODO: if the bid is not accepted, allow only the advertiser to cancel it
-		// if it's accepted, allow only the publisher to cancel it
+		BidState state = bidStates[_bidId];
+
+		if (bid.advertiser == msg.sender) {
+			require(state == BidState.Open);
+		} else {
+			require(state == BidState.Accepted);
+			onBids[bid.advertiser] -= bid.amount;
+		}
+
+		bidStates[_bidId] = BidState.Canceled;
+		LogBidCanceled(_bidId);
 	}
 
 
 	// This can be done if a bid is accepted, but expired
 	// This is essentially the protection from never settling on verification, or from publisher not executing the bid within a reasonable time
 	function refundBid(bytes32 _bidId)
-		onlyRegisteredAcc
-		onlyBidOwner(_bidId)
+		onlyBidAdvertiser(_bidId)
 		onlyBidState(_bidId, BidState.Accepted)
 	{
 		Bid storage bid = bids[_bidId];
@@ -169,7 +176,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 	// both publisher and advertiser have to call this for a bid to be considered verified
 	function verifyBid(bytes32 _bidId, bytes32 _report)
-		onlyRegisteredAcc
 		onlyBidState(_bidId, BidState.Accepted)
 	{
 		Bid storage bid = bids[_bidId];
@@ -177,12 +183,12 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
 
 		if (bid.publisher == msg.sender) {
-			require(! bid.publisherConfrimation);
+			require(bid.publisherConfrimation == 0);
 			bid.publisherConfrimation = _report;
 		}
 
 		if (bid.advertiser == msg.sender) {
-			require(! bid.advertiserConfirmation);
+			require(bid.advertiserConfirmation == 0);
 			bid.advertiserConfirmation = _report;
 		}
 
@@ -197,6 +203,22 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 			LogBidCompleted(_bidId, bid.advertiserConfirmation, bid.publisherConfrimation);
 		}
+	}
+
+	// Deposit and withdraw
+	function deposit(uint _amount)
+	{
+		balances[msg.sender] = SafeMath.add(balances[msg.sender], _amount);
+		require(token.transferFrom(msg.sender, address(this), _amount));
+	}
+
+	function withdraw(_amount)
+	{
+		uint available = SafeMath.sub(balances[msg.sender], onBids[msg.sender]);
+		require(_amount <= available);
+
+		balances[msg.sender] = SafeMath.sub(balances[msg.sender], _amount);
+		require(token.transfer(msg.sender, _amount));
 	}
 
 	//
