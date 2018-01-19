@@ -69,18 +69,17 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	//
 	// MODIFIERS
 	//
-	modifier onlyBidAdvertiser(uint _bidId) {
+	modifier onlyBidAdvertiser(bytes32 _bidId) {
 		require(msg.sender == bids[_bidId].advertiser);
 		_;
 	}
 
-	modifier onlyBidPublisher(uint _bidId) {
+	modifier onlyBidPublisher(bytes32 _bidId) {
 		require(msg.sender == bids[_bidId].publisher);
 		_;
 	}
 
-	modifier onlyBidState(uint _bidId, BidState _state) {
-		require(bids[_bidId].id != 0);
+	modifier onlyBidState(bytes32 _bidId, BidState _state) {
 		require(bidStates[_bidId] == _state);
 		_;
 	}
@@ -97,28 +96,29 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	// 
 
 	// the bid is accepted by the publisher
-	function acceptBid(address _advertiser, bytes32 _adunit, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, bytes32 v, bytes32 s, bytes32 r)
+	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r)
+		public
 	{
-		// TODO: Require: we verify the advertiser sig 
-		// TODO; we verify advertiser's balance and we lock it down
-
-		bytes32 bidId = keccak256(_advertiser, _adunit, _target, _rewardAmount, _timeout, nonce, this);
-
-		Bid storage bid = bidsById[bidId];
-		require(bidStates[bidId] == 0);
-
-		require(didSign(advertiser, hash, v, s, r));
-		require(publisher == msg.sender);
-
-		uint avail = SafeMath.sub(balances[advertiser], onBids[advertiser]);
+		// It can be proven that onBids will never exceed balances which means this can't underflow
+		// SafeMath can't be used here because of the stack depth
+		uint avail = balances[_advertiser] - onBids[_advertiser];
 		require(avail >= _rewardAmount);
+
+		// _opened acts as a nonce here
+		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _rewardAmount, _timeout, _adslot, this);
+
+		require(bidStates[bidId] == BidState.DoesNotExist);
+
+		require(didSign(_advertiser, bidId, v, s, r));
+
+		Bid storage bid = bids[bidId];
 
 		bid.target = _target;
 		bid.amount = _rewardAmount;
 
 		bid.timeout = _timeout;
 
-		bid.advertiser = advertiser;
+		bid.advertiser = _advertiser;
 		bid.adUnit = _adunit;
 
 		bid.publisher = msg.sender;
@@ -128,23 +128,26 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 		bidStates[bidId] = BidState.Accepted;
 
-		onBids[advertiser] += _rewardAmount;
+		onBids[_advertiser] += _rewardAmount;
 
 		// static analysis?
-		// require(onBids[advertiser] <= balances[advertiser]);
+		// require(onBids[_advertiser] <= balances[advertiser]);
 
-		LogBidAccepted(bidId, advertiser, _adunit, publisher, _adslot, bid.acceptedTime);
+		LogBidAccepted(bidId, _advertiser, _adunit, msg.sender, _adslot, bid.acceptedTime);
 	}
 
 	// The bid is canceled by the advertiser or the publisher
-	function cancelBid(uint _bidId)
+	function cancelBid(bytes32 _bidId)
+		public
 	{
+		Bid storage bid = bids[_bidId];
+	
 		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
 
 		BidState state = bidStates[_bidId];
 
 		if (bid.advertiser == msg.sender) {
-			require(state == BidState.Open);
+			require(state == BidState.DoesNotExist);
 		} else {
 			require(state == BidState.Accepted);
 			onBids[bid.advertiser] -= bid.amount;
@@ -158,6 +161,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	// This can be done if a bid is accepted, but expired
 	// This is essentially the protection from never settling on verification, or from publisher not executing the bid within a reasonable time
 	function refundBid(bytes32 _bidId)
+		public
 		onlyBidAdvertiser(_bidId)
 		onlyBidState(_bidId, BidState.Accepted)
 	{
@@ -165,7 +169,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		require(bid.timeout > 0); // you can't refund if you haven't set a timeout
 		require(SafeMath.add(bid.acceptedTime, bid.timeout) < now);
 
-		bidStates[bidId] = BidState.Expired;
+		bidStates[_bidId] = BidState.Expired;
 
 		onBids[bid.advertiser] -= bid.amount;
 
@@ -175,6 +179,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 	// both publisher and advertiser have to call this for a bid to be considered verified
 	function verifyBid(bytes32 _bidId, bytes32 _report)
+		public
 		onlyBidState(_bidId, BidState.Accepted)
 	{
 		Bid storage bid = bids[_bidId];
@@ -182,8 +187,8 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
 
 		if (bid.publisher == msg.sender) {
-			require(bid.publisherConfrimation == 0);
-			bid.publisherConfrimation = _report;
+			require(bid.publisherConfirmation == 0);
+			bid.publisherConfirmation = _report;
 		}
 
 		if (bid.advertiser == msg.sender) {
@@ -191,25 +196,27 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 			bid.advertiserConfirmation = _report;
 		}
 
-		if (bid.advertiserConfirmation && bid.publisherConfrimation) {
+		if (bid.advertiserConfirmation != 0 && bid.publisherConfirmation != 0) {
 			bidStates[_bidId] = BidState.Completed;
 
 			onBids[bid.advertiser] = SafeMath.sub(onBids[bid.advertiser], bid.amount);
 			balances[bid.advertiser] = SafeMath.sub(balances[bid.advertiser], bid.amount);
 			balances[bid.publisher] = SafeMath.add(balances[bid.publisher], bid.amount);
 
-			LogBidCompleted(_bidId, bid.advertiserConfirmation, bid.publisherConfrimation);
+			LogBidCompleted(_bidId, bid.advertiserConfirmation, bid.publisherConfirmation);
 		}
 	}
 
 	// Deposit and withdraw
 	function deposit(uint _amount)
+		public
 	{
 		balances[msg.sender] = SafeMath.add(balances[msg.sender], _amount);
 		require(token.transferFrom(msg.sender, address(this), _amount));
 	}
 
-	function withdraw(_amount)
+	function withdraw(uint _amount)
+		public
 	{
 		uint available = SafeMath.sub(balances[msg.sender], onBids[msg.sender]);
 		require(_amount <= available);
@@ -230,22 +237,22 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	//
 	// Public constant functions
 	//
-	function getBid(uint _bidId) 
+	function getBid(bytes32 _bidId) 
 		constant
 		external
 		returns (
 			uint, uint, uint, uint, uint, 
 			// advertiser (advertiser, ad unit, confiration)
-			bytes32, bytes32, bytes32
+			address, bytes32, bytes32,
 			// publisher (publisher, ad slot, confirmation)
-			bytes32, bytes32, bytes32
+			address, bytes32, bytes32
 		)
 	{
 		var bid = bids[_bidId];
 		return (
 			uint(bidStates[_bidId]), bid.target, bid.timeout, bid.amount, bid.acceptedTime,
 			bid.advertiser, bid.adUnit, bid.advertiserConfirmation,
-			bid.publisher, bid.adSlot, bid.publisherConfrimation
+			bid.publisher, bid.adSlot, bid.publisherConfirmation
 		);
 	}
 
