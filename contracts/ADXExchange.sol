@@ -105,7 +105,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		require(avail >= _rewardAmount);
 
 		// _opened acts as a nonce here
-		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _rewardAmount, _timeout, _adslot, this);
+		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _rewardAmount, _timeout, this);
 
 		require(bidStates[bidId] == BidState.DoesNotExist);
 
