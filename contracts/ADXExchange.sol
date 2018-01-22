@@ -96,20 +96,20 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	// 
 
 	// the bid is accepted by the publisher
-	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r)
+	function acceptBid(bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r)
 		public
 	{
+		// _opened acts as a nonce here
+		bytes32 bidId = keccak256(_adunit, _opened, _target, _rewardAmount, _timeout, this);
+
+		address _advertiser = ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s);
+
 		// It can be proven that onBids will never exceed balances which means this can't underflow
 		// SafeMath can't be used here because of the stack depth
 		uint avail = balances[_advertiser] - onBids[_advertiser];
 		require(avail >= _rewardAmount);
 
-		// _opened acts as a nonce here
-		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _rewardAmount, _timeout, this);
-
 		require(bidStates[bidId] == BidState.DoesNotExist);
-
-		require(didSign(_advertiser, bidId, v, s, r));
 
 		Bid storage bid = bids[bidId];
 
@@ -223,15 +223,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 		balances[msg.sender] = SafeMath.sub(balances[msg.sender], _amount);
 		require(token.transfer(msg.sender, _amount));
-	}
-
-	//
-	// Internal helpers
-	//
-	function didSign(address addr, bytes32 hash, uint8 v, bytes32 r, bytes32 s) 
-		internal pure returns (bool) 
-	{
-		return ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash), v, r, s) == addr;
 	}
 
 	//
