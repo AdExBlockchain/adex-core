@@ -137,19 +137,21 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	}
 
 	// The bid is canceled by the advertiser or the publisher
-	function cancelBid(bytes32 _bidId)
+	function cancelBid(bytes32 _bidId, uint8 v, bytes32 s, bytes32 r)
 		public
 	{
-		Bid storage bid = bids[_bidId];
-	
-		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
-
 		BidState state = bidStates[_bidId];
 
-		if (bid.advertiser == msg.sender) {
-			require(state == BidState.DoesNotExist);
+		require(state == BidState.DoesNotExist || state == BidState.Accepted);
+
+		if (state == BidState.DoesNotExist) {
+			// only an advertiser can cancel
+			address advertiser = ecrecover(keccak256("\x19Ethereum Signed Message:\n32", _bidId), v, r, s);
+			require(msg.sender == advertiser);
 		} else {
-			require(state == BidState.Accepted);
+			// only a publisher can cancel an Accepted bid
+			Bid storage bid = bids[_bidId];
+			require(msg.sender == bid.publisher);
 			onBids[bid.advertiser] -= bid.amount;
 		}
 
