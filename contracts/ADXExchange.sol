@@ -42,9 +42,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	}
 
 	struct Bid {
-		// ADX reward amount
-		uint amount;
-
 		// Links on advertiser side
 		address advertiser;
 		bytes32 adUnit;
@@ -55,11 +52,12 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 		uint acceptedTime; // when was it accepted by a publisher
 
-		// Requirements
+		// ADX reward amount
+		uint amount;
 
-		//RequirementType type;
+		// Requirements
 		uint target; // how many impressions/clicks/conversions have to be done
-		uint timeout;
+		uint timeout; // the time to execute
 
 		// Confirmations from both sides; any value other than 0 is vconsidered as confirm, but this should usually be an IPFS hash to a final report
 		bytes32 publisherConfirmation;
