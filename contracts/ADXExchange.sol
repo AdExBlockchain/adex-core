@@ -97,18 +97,17 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r)
 		public
 	{
-		// _opened acts as a nonce here
-		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _rewardAmount, _timeout, this);
-
-		address adv = ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s);
-		require(_advertiser == adv);
-
 		// It can be proven that onBids will never exceed balances which means this can't underflow
 		// SafeMath can't be used here because of the stack depth
 		uint avail = balances[_advertiser] - onBids[_advertiser];
 		require(avail >= _rewardAmount);
 
+		// _opened acts as a nonce here
+		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _rewardAmount, _timeout, this);
+
 		require(bidStates[bidId] == BidState.DoesNotExist);
+
+		require(_advertiser == ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s));
 
 		Bid storage bid = bids[bidId];
 
@@ -141,9 +140,9 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	{
 		BidState state = bidStates[_bidId];
 
-		require(state == BidState.DoesNotExist/* || state == BidState.Accepted*/);
+		require(/*state == BidState.DoesNotExist ||*/ state == BidState.Accepted);
 
-		if (state == BidState.DoesNotExist) {
+		/*if (state == BidState.DoesNotExist) {
 
 			// FLAWWED
 
@@ -153,12 +152,12 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 			// only an advertiser can cancel
 			address advertiser = ecrecover(keccak256("\x19Ethereum Signed Message:\n32", _bidId), v, r, s);
 			require(msg.sender == advertiser);
-		}/* else {
+		} else {*/
 			// only a publisher can cancel an Accepted bid
 			Bid storage bid = bids[_bidId];
 			require(msg.sender == bid.publisher);
 			onBids[bid.advertiser] -= bid.amount;
-		}*/
+		//}
 
 		bidStates[_bidId] = BidState.Canceled;
 		LogBidCanceled(_bidId);
