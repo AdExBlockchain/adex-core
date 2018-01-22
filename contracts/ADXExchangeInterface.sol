@@ -7,8 +7,8 @@ contract ADXExchangeInterface {
 	event LogBidExpired(bytes32 bidId);
 	event LogBidCompleted(bytes32 bidId, bytes32 advReport, bytes32 pubReport);
 
-	function acceptBid(bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r) public;
-	function cancelBid(bytes32 _bidId, uint8 v, bytes32 s, bytes32 r) public;
+	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r) public;
+	function cancelBid(bytes32 _bidId) public;
 	function refundBid(bytes32 _bidId) public;
 	function verifyBid(bytes32 _bidId, bytes32 _report) public;
 

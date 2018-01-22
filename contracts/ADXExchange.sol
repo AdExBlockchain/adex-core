@@ -94,13 +94,14 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	// 
 
 	// the bid is accepted by the publisher
-	function acceptBid(bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r)
+	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r)
 		public
 	{
 		// _opened acts as a nonce here
-		bytes32 bidId = keccak256(_adunit, _opened, _target, _rewardAmount, _timeout, this);
+		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _rewardAmount, _timeout, this);
 
-		address _advertiser = ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s);
+		address adv = ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s);
+		require(_advertiser == adv);
 
 		// It can be proven that onBids will never exceed balances which means this can't underflow
 		// SafeMath can't be used here because of the stack depth
@@ -135,23 +136,29 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	}
 
 	// The bid is canceled by the advertiser or the publisher
-	function cancelBid(bytes32 _bidId, uint8 v, bytes32 s, bytes32 r)
+	function cancelBid(bytes32 _bidId)
 		public
 	{
 		BidState state = bidStates[_bidId];
 
-		require(state == BidState.DoesNotExist || state == BidState.Accepted);
+		require(state == BidState.DoesNotExist/* || state == BidState.Accepted*/);
 
 		if (state == BidState.DoesNotExist) {
+
+			// FLAWWED
+
+			// FLWED
+			// FLAWED
+
 			// only an advertiser can cancel
 			address advertiser = ecrecover(keccak256("\x19Ethereum Signed Message:\n32", _bidId), v, r, s);
 			require(msg.sender == advertiser);
-		} else {
+		}/* else {
 			// only a publisher can cancel an Accepted bid
 			Bid storage bid = bids[_bidId];
 			require(msg.sender == bid.publisher);
 			onBids[bid.advertiser] -= bid.amount;
-		}
+		}*/
 
 		bidStates[_bidId] = BidState.Canceled;
 		LogBidCanceled(_bidId);
