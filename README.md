@@ -20,8 +20,6 @@ yarn test
 
 ``adex-token.eth`` - ERC20 token of AdEx
 
-``adex-registry.eth`` - the registry contract of AdEx - handles accounts, ad units, ad slots and others
-
 ``adex-exchange.eth`` - the on-chain advertising exchange
 
 ## NEO Port
@@ -34,3 +32,6 @@ The AdEx Core will still be available and maintained for Ethereum.
 
 - [ADXRegistry](/docs/registry.md)
 - [ADXExchange](/docs/exchange.md)
+
+## Test requirements:
+- [ganache-cli](https://github.com/trufflesuite/ganache-cli)
