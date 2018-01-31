@@ -57,7 +57,8 @@ contract('ADXExchange', function(accounts) {
 
 	it("deposit(): tokens to the exchange", function() {
 		var amnt = 500 * 10000
-		adxToken.approve(adxExchange.address, amnt, { from: accOne })
+		
+		return adxToken.approve(adxExchange.address, amnt, { from: accOne })
 		.then(function() {
 			return adxExchange.deposit(amnt)
 		})
