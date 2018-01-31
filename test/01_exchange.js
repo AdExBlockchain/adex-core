@@ -13,7 +13,7 @@ contract('ADXExchange', function(accounts) {
 	//# can deposit
 	//# can't deposit w/o allowance
 
-	// can withdraw
+	//# can withdraw
 
 	// cannot withdraw more than balance (factoring in on bids); esp test for onbds
 
@@ -55,11 +55,11 @@ contract('ADXExchange', function(accounts) {
 
 	// deposit()
 	it("deposit(): cannot if there is no allowance", function() {
-		return shouldFail(adxExchange.deposit(500 * 10000))
+		return shouldFail(adxExchange.deposit(500))
 	})
 
 	it("deposit(): tokens to the exchange", function() {
-		var amnt = 500 * 10000
+		var amnt = 500
 		
 		return adxToken.approve(adxExchange.address, amnt, { from: accOne })
 		.then(function() {
@@ -77,27 +77,27 @@ contract('ADXExchange', function(accounts) {
 	it("deposit(): the expected balance is on the SC", function() {
 		return adxToken.balanceOf(adxExchange.address)
 		.then(function(resp) {
-			assert(resp.toNumber() == 500 * 10000, "expected balance is there")
+			assert(resp.toNumber() == 500, "expected balance is there")
 		})
 	})
 
 
 	// withdraw()
 	it("withdraw(): cannot withdraw more than our balance", function() {
-		var amnt = 20 * 10000
+		var amnt = 20
 
 		// first add +20 tokens to the exchange so we can try if we can over-withdraw
 		return adxToken.transfer(adxExchange.address, amnt, { from: accOne })
 		.then(function() {
-			return shouldFail(adxExchange.withdraw(510 * 10000, { from: accOne }))
+			return shouldFail(adxExchange.withdraw(510, { from: accOne }))
 		})
-
-		// TODO: .getBalance() - see if changes
 	})
 
 	it("withdraw(): can wihdraw our balance", function() {
-		var amnt = 50 * 10000
+		var orgAmnt = 500
+		var amnt = 50
 		var ctrl 
+
 		return adxToken.balanceOf(accOne)
 		.then(function(resp) {
 			ctrl = resp.toNumber()
@@ -108,6 +108,11 @@ contract('ADXExchange', function(accounts) {
 		})
 		.then(function(resp) {
 			assert(resp.toNumber() == ctrl + amnt, "amount makes sense")
+
+			return adxExchange.getBalance(accOne)
+		})
+		.then(function(resp) {
+			assert(resp[0].toNumber() == orgAmnt - amnt, "on-exchange amount got reduced")
 		})
 		
 		// TODO: .getBalance() - see if changes
