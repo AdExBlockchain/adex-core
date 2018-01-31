@@ -24,6 +24,6 @@
     "solc": "0.4.19"
   },
   "devDependencies": {
-    "truffle": "^4.0.0"
+    "truffle": "^4.0.5"
   }
 }
