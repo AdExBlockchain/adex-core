@@ -18,13 +18,9 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
  	// escrowed on bids
  	mapping (address => uint) onBids; 
 
+ 	// bid info
 	mapping (bytes32 => Bid) bids;
 	mapping (bytes32 => BidState) bidStates;
-
-	// TODO: some properties in the bid structure - achievedPoints/peers for example - are not used atm
-	
-	// TODO: keep bid state separately, because of canceling
-	// An advertiser would be able to cancel their own bid (id is hash) when signing a message of the hash and calling the cancelBid() fn
 
 	enum BidState { 
 		DoesNotExist, // default state
@@ -52,7 +48,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 		uint acceptedTime; // when was it accepted by a publisher
 
-		// ADX reward amount
+		// Token reward amount
 		uint amount;
 
 		// Requirements
@@ -146,9 +142,11 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		require(msg.sender == ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s));
 
 		bidStates[bidId] = BidState.Canceled;
+
+		LogBidCanceled(bidId);
 	}
 
-	// The bid is canceled publisher
+	// The bid is canceled by the publisher
 	function giveupBid(bytes32 _bidId)
 		public
 		onlyBidPublisher(_bidId)
