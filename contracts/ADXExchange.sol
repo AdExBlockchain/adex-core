@@ -134,32 +134,33 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		LogBidAccepted(bidId, _advertiser, _adunit, msg.sender, _adslot, bid.acceptedTime);
 	}
 
-	// The bid is canceled by the advertiser or the publisher
-	function cancelBid(bytes32 _bidId)
+	// The bid is canceled by the advertiser
+	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, uint8 v, bytes32 s, bytes32 r)
 		public
 	{
-		BidState state = bidStates[_bidId];
+		// _opened acts as a nonce here
+		bytes32 bidId = keccak256(msg.sender, _adunit, _opened, _target, _rewardAmount, _timeout, this);
 
-		require(/*state == BidState.DoesNotExist ||*/ state == BidState.Accepted);
+		require(bidStates[bidId] == BidState.DoesNotExist);
 
-		/*if (state == BidState.DoesNotExist) {
+		require(msg.sender == ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s));
 
-			// FLAWWED
+		bidStates[bidId] = BidState.Canceled;
+	}
 
-			// FLWED
-			// FLAWED
-
-			// only an advertiser can cancel
-			address advertiser = ecrecover(keccak256("\x19Ethereum Signed Message:\n32", _bidId), v, r, s);
-			require(msg.sender == advertiser);
-		} else {*/
-			// only a publisher can cancel an Accepted bid
-			Bid storage bid = bids[_bidId];
-			require(msg.sender == bid.publisher);
-			onBids[bid.advertiser] -= bid.amount;
-		//}
+	// The bid is canceled publisher
+	function giveupBid(bytes32 _bidId)
+		public
+		onlyBidPublisher(_bidId)
+		onlyBidState(_bidId, BidState.Accepted)
+	{
+		// only a publisher can cancel an Accepted bid
+		Bid storage bid = bids[_bidId];
 
 		bidStates[_bidId] = BidState.Canceled;
+
+		onBids[bid.advertiser] -= bid.amount;
+	
 		LogBidCanceled(_bidId);
 	}
 
