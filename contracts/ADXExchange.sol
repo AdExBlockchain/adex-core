@@ -94,16 +94,16 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	// 
 
 	// the bid is accepted by the publisher
-	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r)
+	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r)
 		public
 	{
 		// It can be proven that onBids will never exceed balances which means this can't underflow
 		// SafeMath can't be used here because of the stack depth
 		uint avail = balances[_advertiser] - onBids[_advertiser];
-		require(avail >= _rewardAmount);
+		require(avail >= _amount);
 
 		// _opened acts as a nonce here
-		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _rewardAmount, _timeout, this);
+		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, this);
 
 		require(bidStates[bidId] == BidState.DoesNotExist);
 
@@ -112,7 +112,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		Bid storage bid = bids[bidId];
 
 		bid.target = _target;
-		bid.amount = _rewardAmount;
+		bid.amount = _amount;
 
 		bid.timeout = _timeout;
 
@@ -126,7 +126,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 		bidStates[bidId] = BidState.Accepted;
 
-		onBids[_advertiser] += _rewardAmount;
+		onBids[_advertiser] += _amount;
 
 		// static analysis?
 		// require(onBids[_advertiser] <= balances[advertiser]);
@@ -135,11 +135,11 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	}
 
 	// The bid is canceled by the advertiser
-	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, uint8 v, bytes32 s, bytes32 r)
+	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, uint8 v, bytes32 s, bytes32 r)
 		public
 	{
 		// _opened acts as a nonce here
-		bytes32 bidId = keccak256(msg.sender, _adunit, _opened, _target, _rewardAmount, _timeout, this);
+		bytes32 bidId = keccak256(msg.sender, _adunit, _opened, _target, _amount, _timeout, this);
 
 		require(bidStates[bidId] == BidState.DoesNotExist);
 
