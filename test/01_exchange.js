@@ -10,7 +10,12 @@ contract('ADXExchange', function(accounts) {
 
 	// PLAN: 
 
-	// can deposit
+	//# can deposit
+	//# can't deposit w/o allowance
+
+	// can withdraw
+
+	// cannot withdraw more than balance (factoring in on bids); esp test for onbds
 
 	// cannot accept a bid that is not properly signed
 	// cannot accept a bid where the advertiser does not have tokens
@@ -32,9 +37,6 @@ contract('ADXExchange', function(accounts) {
 	// cannot verifyBid more than once
 	// can verify only if publisher or advertiser
 
-	// can withdraw
-	// cannot withdraw more than balance (factoring in on bids)
-
 	var adxToken;
 	it("create adx mock token", function() {
 		return ADXMock.new({ from: accOne }).then(function(_adxToken) {
@@ -51,6 +53,7 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
+	// deposit()
 	it("deposit(): cannot if there is no allowance", function() {
 		return shouldFail(adxExchange.deposit(500 * 10000))
 	})
@@ -78,6 +81,37 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
+
+	// withdraw()
+	it("withdraw(): cannot withdraw more than our balance", function() {
+		var amnt = 20 * 10000
+
+		// first add +20 tokens to the exchange so we can try if we can over-withdraw
+		return adxToken.transfer(adxExchange.address, amnt, { from: accOne })
+		.then(function() {
+			return shouldFail(adxExchange.withdraw(510 * 10000, { from: accOne }))
+		})
+
+		// TODO: .getBalance() - see if changes
+	})
+
+	it("withdraw(): can wihdraw our balance", function() {
+		var amnt = 50 * 10000
+		var ctrl 
+		return adxToken.balanceOf(accOne)
+		.then(function(resp) {
+			ctrl = resp.toNumber()
+			return adxExchange.withdraw(amnt)
+		})
+		.then(function() {
+			return adxToken.balanceOf(accOne)
+		})
+		.then(function(resp) {
+			assert(resp.toNumber() == ctrl + amnt, "amount makes sense")
+		})
+		
+		// TODO: .getBalance() - see if changes
+	})
 
 	// HELPERS
 	function bidID(advertiser, adunit, opened, target, amount, timeout, sc)
