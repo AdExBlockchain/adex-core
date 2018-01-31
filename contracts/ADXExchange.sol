@@ -81,6 +81,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	// Functions
 
 	function ADXExchange(address _token)
+		public
 	{
 		token = ERC20(_token);
 	}

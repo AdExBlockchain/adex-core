@@ -18,7 +18,7 @@ contract ADXMock is StandardToken {
   /**
    * @dev Contructor that gives msg.sender all of existing tokens. 
    */
-  function ADXMock() {
+  function ADXMock() public {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
