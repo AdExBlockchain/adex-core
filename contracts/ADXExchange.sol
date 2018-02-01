@@ -105,6 +105,9 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		require(bidStates[bidId] == BidState.DoesNotExist);
 
 		require(_advertiser == ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s));
+		
+		// advertier and publisher cannot be the same
+		require(_advertiser != msg.sender);
 
 		Bid storage bid = bids[bidId];
 

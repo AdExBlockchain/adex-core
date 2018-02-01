@@ -19,6 +19,7 @@ contract('ADXExchange', function(accounts) {
 
 	// cannot accept a bid that is not properly signed
 	// cannot accept a bid where the advertiser does not have tokens
+	// cannot accept a bid where the advertiser is the publisher
 	// can accept a bid that is properly signed and has tokens
 	
 	// can cancelBid
