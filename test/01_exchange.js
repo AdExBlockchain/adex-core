@@ -141,6 +141,8 @@ contract('ADXExchange', function(accounts) {
 			return web3.eth.sign(acc, id)
 		})
 		.then(function(resp) {
+			resp = resp.slice(2)
+
 			r = '0x'+resp.substring(0, 64)
 			s = '0x'+resp.substring(64, 128)
 			v = parseInt(resp.substring(128, 130)) + 27
@@ -153,7 +155,6 @@ contract('ADXExchange', function(accounts) {
 		return shouldFail(adxExchange.acceptBid(acc, '0x1', bidOpened, 10000, 30, 0, '0x2', v, r, s, { from: acc }))
 	})
 
-
 	it("publisher: can accept bid", function() {
 		// TODO: check for balances and etc (if they change)
 		// TODO: check if can accept with invalid sig and all those things
@@ -161,9 +162,20 @@ contract('ADXExchange', function(accounts) {
 
 		var acc = accThree
 
-		return adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', v, r, s, { from: acc })
+
+		return adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc })
 		.then(function(resp) {
-			console.log(resp)
+			var ev = resp.logs[0]
+			if (! ev) throw 'no event'
+
+			assert.equal(ev.event, "LogBidAccepted")
+			assert.equal(ev.args.bidId, bidId)
+			assert.equal(ev.args.advertiser, accTwo)
+			assert.equal(ev.args.adunit, '0x1000000000000000000000000000000000000000000000000000000000000000')
+			assert.equal(ev.args.publisher, accThree)
+			assert.equal(ev.args.adslot, '0x2000000000000000000000000000000000000000000000000000000000000000')
+			acceptedTime = ev.args.acceptedTime;
+			assert.equal(ev.args.acceptedTime.toNumber() > 1502219400, true) // just ensure the acceptedTime makes vague sense
 		})
 	})
 
