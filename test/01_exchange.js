@@ -35,7 +35,7 @@ contract('ADXExchange', function(accounts) {
 	// cannot refundBid if not expired
 	// can call this only as the advertiser
 
-	// can verifyBid from both sides
+	//# can verifyBid from both sides
 	// cannot verifyBid more than once
 	// can verify only if publisher or advertiser
 
@@ -196,6 +196,10 @@ contract('ADXExchange', function(accounts) {
 		.then(function(resp) {
 			//console.log(resp)
 		})
+	})
+
+	it("verify bid - cannot more than once", function() {
+		return shouldFail(adxExchange.verifyBid(bidId, '0x22', { from: accThree }))
 	})
 
 	it("verify bid - advertiser", function() {
