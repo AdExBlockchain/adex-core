@@ -114,8 +114,6 @@ contract('ADXExchange', function(accounts) {
 		.then(function(resp) {
 			assert(resp[0].toNumber() == orgAmnt - amnt, "on-exchange amount got reduced")
 		})
-		
-		// TODO: .getBalance() - see if changes
 	})
 
 	// HELPERS
