@@ -155,9 +155,14 @@ contract('ADXExchange', function(accounts) {
 		return shouldFail(adxExchange.acceptBid(acc, '0x1', bidOpened, 10000, 30, 0, '0x2', v, r, s, { from: acc }))
 	})
 
+	it("publisher: cannot accept a bid with wrong data", function() {
+		var acc = accTwo
+
+		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 50, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc }))
+	})
+
 	it("publisher: can accept bid", function() {
 		// TODO: check for balances and etc (if they change)
-		// TODO: check if can accept with invalid sig and all those things
 		// TODO: cannot accept a bid if the advertiser does not have the tokens
 
 		var acc = accThree
@@ -179,6 +184,11 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
+	it("publisher: cannot accept a bid twice", function() {
+		var acc = accTwo
+
+		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc }))
+	})
 
 
 
