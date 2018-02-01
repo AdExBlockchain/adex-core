@@ -91,7 +91,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	// 
 
 	// the bid is accepted by the publisher
-	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 s, bytes32 r)
+	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 r, bytes32 s)
 		public
 	{
 		// It can be proven that onBids will never exceed balances which means this can't underflow
@@ -100,7 +100,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		require(avail >= _amount);
 
 		// _opened acts as a nonce here
-		bytes32 bidId = keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, this);
+		bytes32 bidId = getBidID(_advertiser, _adunit, _opened, _target, _amount, _timeout);
 
 		require(bidStates[bidId] == BidState.DoesNotExist);
 
@@ -122,6 +122,8 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		bid.publisher = msg.sender;
 		bid.adSlot = _adslot;
 
+		bid.acceptedTime = now;
+
 		bids[bidId] = bid;
 
 		bidStates[bidId] = BidState.Accepted;
@@ -135,11 +137,11 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	}
 
 	// The bid is canceled by the advertiser
-	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, uint8 v, bytes32 s, bytes32 r)
+	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, uint8 v, bytes32 r, bytes32 s)
 		public
 	{
 		// _opened acts as a nonce here
-		bytes32 bidId = keccak256(msg.sender, _adunit, _opened, _target, _amount, _timeout, this);
+		bytes32 bidId = getBidID(msg.sender, _adunit, _opened, _target, _amount, _timeout);
 
 		require(bidStates[bidId] == BidState.DoesNotExist);
 
@@ -264,6 +266,13 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		return (balances[_user], onBids[_user]);
 	}
 
+	function getBidID(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout)
+		constant
+		public
+		returns (bytes32)
+	{
+		return keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, this);
+	}
 	//
 	// Events
 	//

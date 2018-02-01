@@ -54,6 +54,11 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
+	// fund advertiser with some tokens
+	it("send tokens to advertiser", function() {
+		return adxToken.transfer(accTwo, 1000)
+	})
+
 	// deposit()
 	it("deposit(): cannot if there is no allowance", function() {
 		return shouldFail(adxExchange.deposit(500))
@@ -61,13 +66,14 @@ contract('ADXExchange', function(accounts) {
 
 	it("deposit(): tokens to the exchange", function() {
 		var amnt = 500
+		var acc = accTwo
 		
-		return adxToken.approve(adxExchange.address, amnt, { from: accOne })
+		return adxToken.approve(adxExchange.address, amnt, { from: acc })
 		.then(function() {
-			return adxExchange.deposit(amnt)
+			return adxExchange.deposit(amnt, { from: acc })
 		})
 		.then(function() {
-			return adxExchange.getBalance(accOne)
+			return adxExchange.getBalance(acc)
 		})
 		.then(function(resp) {
 			assert(resp[0].toNumber() == amnt, "exchange reports expected balance")
@@ -86,44 +92,83 @@ contract('ADXExchange', function(accounts) {
 	// withdraw()
 	it("withdraw(): cannot withdraw more than our balance", function() {
 		var amnt = 20
+		var acc = accTwo
 
 		// first add +20 tokens to the exchange so we can try if we can over-withdraw
-		return adxToken.transfer(adxExchange.address, amnt, { from: accOne })
+		return adxToken.transfer(adxExchange.address, amnt, { from: acc })
 		.then(function() {
-			return shouldFail(adxExchange.withdraw(510, { from: accOne }))
+			return shouldFail(adxExchange.withdraw(510, { from: acc }))
 		})
 	})
 
-	it("withdraw(): can wihdraw our balance", function() {
+	it("withdraw(): can withdraw our balance", function() {
 		var orgAmnt = 500
 		var amnt = 50
 		var ctrl 
 
-		return adxToken.balanceOf(accOne)
+		var acc = accTwo
+
+		return adxToken.balanceOf(acc)
 		.then(function(resp) {
 			ctrl = resp.toNumber()
-			return adxExchange.withdraw(amnt)
+			return adxExchange.withdraw(amnt, { from: acc })
 		})
 		.then(function() {
-			return adxToken.balanceOf(accOne)
+			return adxToken.balanceOf(acc)
 		})
 		.then(function(resp) {
 			assert(resp.toNumber() == ctrl + amnt, "amount makes sense")
 
-			return adxExchange.getBalance(accOne)
+			return adxExchange.getBalance(acc)
 		})
 		.then(function(resp) {
 			assert(resp[0].toNumber() == orgAmnt - amnt, "on-exchange amount got reduced")
 		})
 	})
 
-	// HELPERS
-	function bidID(advertiser, adunit, opened, target, amount, timeout, sc)
-	{
-		return web3.utils.soliditySha3(advertiser, adunit, opened, target, amount, timeout, sc)
-	}
+	// Bids
+	var bidId
+	var bidOpened = Math.floor(Date.now()/1000)
+	var r, s, v
 
-	// TODO sign
+	it("advertiser: sign a bid", function() {
+		var acc = accTwo
+
+		// NOTE: not needed to use the SC to get the bid ID, we can do soliditySha3(..., adxExchange.address) too
+		return adxExchange.getBidID(acc, '0x1', bidOpened, 10000, 30, 0)
+		.then(function(id) {
+			bidId = id
+			return web3.eth.sign(acc, id)
+		})
+		.then(function(resp) {
+			r = '0x'+resp.substring(0, 64)
+			s = '0x'+resp.substring(64, 128)
+			v = parseInt(resp.substring(128, 130)) + 27
+		})
+	})
+
+	it("advertiser: cannot accept their own bid", function() {
+		var acc = accTwo
+
+		return shouldFail(adxExchange.acceptBid(acc, '0x1', bidOpened, 10000, 30, 0, '0x2', v, r, s, { from: acc }))
+	})
+
+
+	it("publisher: can accept bid", function() {
+		// TODO: check for balances and etc (if they change)
+		// TODO: check if can accept with invalid sig and all those things
+		// TODO: cannot accept a bid if the advertiser does not have the tokens
+
+		var acc = accThree
+
+		return adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', v, r, s, { from: acc })
+		.then(function(resp) {
+			console.log(resp)
+		})
+	})
+
+
+
 
 	function shouldFail(promise)
 	{
