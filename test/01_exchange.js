@@ -17,10 +17,11 @@ contract('ADXExchange', function(accounts) {
 
 	// cannot withdraw more than balance (factoring in on bids); esp test for onbds
 
-	// cannot accept a bid that is not properly signed
+	//# cannot accept a bid that is not properly signed
 	// cannot accept a bid where the advertiser does not have tokens
 	// cannot accept a bid where the advertiser is the publisher
-	// can accept a bid that is properly signed and has tokens
+	// cannot accept a bid that is already accepted
+	//# can accept a bid that is properly signed and has tokens
 	
 	// can cancelBid
 	// cannot cancel someone else's bid (is it possible?
@@ -190,6 +191,33 @@ contract('ADXExchange', function(accounts) {
 		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc }))
 	})
 
+	it("verify bid - publisher", function() {
+		adxExchange.verifyBid(bidId, '0x22', { from: accThree })
+		.then(function(resp) {
+			//console.log(resp)
+		})
+	})
+
+	it("verify bid - advertiser", function() {
+		var ctrl 
+
+		return adxToken.balanceOf(accThree)
+		.then(function(resp) {
+			ctrl = resp.toNumber()
+			return adxExchange.verifyBid(bidId, '0x23', { from: accTwo })
+		})
+		.then(function(resp) {
+			var ev = resp.logs[0]
+			if (! ev) throw 'no event'
+
+			assert.equal(ev.event, "LogBidCompleted")
+
+			return adxExchange.getBalance(accThree)
+		})
+		.then(function(resp) {
+			assert(resp[0].toNumber() == ctrl + 30, "amount makes sense")
+		})
+	})
 
 
 	function shouldFail(promise)
