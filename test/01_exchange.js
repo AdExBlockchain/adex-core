@@ -20,7 +20,7 @@ contract('ADXExchange', function(accounts) {
 	//# cannot accept a bid that is not properly signed
 	// cannot accept a bid where the advertiser does not have tokens
 	// cannot accept a bid where the advertiser is the publisher
-	// cannot accept a bid that is already accepted
+	//# cannot accept a bid that is already accepted
 	//# can accept a bid that is properly signed and has tokens
 	
 	// can cancelBid
@@ -36,8 +36,8 @@ contract('ADXExchange', function(accounts) {
 	// can call this only as the advertiser
 
 	//# can verifyBid from both sides
-	// cannot verifyBid more than once
-	// can verify only if publisher or advertiser
+	//# cannot verifyBid more than once
+	//# can verify only if publisher or advertiser
 
 	var adxToken;
 	it("create adx mock token", function() {
@@ -189,6 +189,10 @@ contract('ADXExchange', function(accounts) {
 		var acc = accTwo
 
 		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc }))
+	})
+
+	it("verify bid - should fail if not advertiser or publisher", function() {
+		return shouldFail(adxExchange.verifyBid(bidId, '0x22', { from: web3.eth.accounts[4] }))
 	})
 
 	it("verify bid - publisher", function() {
