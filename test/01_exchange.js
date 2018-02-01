@@ -186,7 +186,7 @@ contract('ADXExchange', function(accounts) {
 	})
 
 	it("publisher: cannot accept a bid twice", function() {
-		var acc = accTwo
+		var acc = accThree
 
 		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc }))
 	})
