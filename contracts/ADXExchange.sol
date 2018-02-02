@@ -11,8 +11,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 
 	ERC20 public token;
 
-	// TODO: ensure every func mutates bid state and emits an event
-
  	mapping (address => uint) balances;
 
  	// escrowed on bids
