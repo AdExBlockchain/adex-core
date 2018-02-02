@@ -155,7 +155,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		onlyBidPublisher(_bidId)
 		onlyBidState(_bidId, BidState.Accepted)
 	{
-		// only a publisher can cancel an Accepted bid
 		Bid storage bid = bids[_bidId];
 
 		bidStates[_bidId] = BidState.Canceled;
@@ -174,6 +173,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		onlyBidState(_bidId, BidState.Accepted)
 	{
 		Bid storage bid = bids[_bidId];
+
 		require(bid.timeout > 0); // you can't refund if you haven't set a timeout
 		require(SafeMath.add(bid.acceptedTime, bid.timeout) < now);
 
@@ -247,7 +247,7 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 			address, bytes32, bytes32
 		)
 	{
-		var bid = bids[_bidId];
+		Bid storage bid = bids[_bidId];
 		return (
 			uint(bidStates[_bidId]), bid.target, bid.timeout, bid.amount, bid.acceptedTime,
 			bid.advertiser, bid.adUnit, bid.advertiserConfirmation,
@@ -270,10 +270,10 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 	{
 		return keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, this);
 	}
+
 	//
 	// Events
 	//
-
 	event LogBidAccepted(uint bidId, address advertiser, bytes32 adunit, address publisher, bytes32 adslot, uint acceptedTime);
 
 	event LogBidCanceled(uint bidId);
