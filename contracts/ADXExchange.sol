@@ -44,7 +44,8 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		address publisher;
 		bytes32 adSlot;
 
-		uint acceptedTime; // when was it accepted by a publisher
+		// when was it accepted by a publisher
+		uint acceptedTime;
 
 		// Token reward amount
 		uint amount;
@@ -121,8 +122,6 @@ contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
 		bid.adSlot = _adslot;
 
 		bid.acceptedTime = now;
-
-		bids[bidId] = bid;
 
 		bidStates[bidId] = BidState.Accepted;
 
