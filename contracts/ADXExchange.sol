@@ -174,7 +174,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		Bid storage bid = bids[_bidId];
 
 		require(bid.timeout > 0); // you can't refund if you haven't set a timeout
-		require(SafeMath.add(bid.acceptedTime, bid.timeout) < now);
+		require(now > SafeMath.add(bid.acceptedTime, bid.timeout)); // require that we're past the point of expiry
 
 		bidStates[_bidId] = BidState.Expired;
 
