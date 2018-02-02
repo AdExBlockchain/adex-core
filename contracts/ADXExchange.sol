@@ -94,8 +94,8 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	{
 		// It can be proven that onBids will never exceed balances which means this can't underflow
 		// SafeMath can't be used here because of the stack depth
-		uint avail = balances[_advertiser] - onBids[_advertiser];
-		require(avail >= _amount);
+		uint available = balances[_advertiser] - onBids[_advertiser];
+		require(_amount <= available);
 
 		// _opened acts as a nonce here
 		bytes32 bidId = getBidID(_advertiser, _adunit, _opened, _target, _amount, _timeout);
