@@ -1,12 +1,11 @@
 pragma solidity ^0.4.18;
 
-import "../zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./helpers/Drainable.sol";
 import "./ADXExchangeInterface.sol";
 import "../zeppelin-solidity/contracts/token/ERC20.sol";
 
-contract ADXExchange is ADXExchangeInterface, Ownable, Drainable {
+contract ADXExchange is ADXExchangeInterface, Drainable {
 	string public name = "AdEx Exchange";
 
 	ERC20 public token;
