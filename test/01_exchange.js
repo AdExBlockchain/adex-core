@@ -191,6 +191,12 @@ contract('ADXExchange', function(accounts) {
 		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc }))
 	})
 
+	it("advertiser: cannot refundBid with 0 timeout", function() {
+		var acc = accTwo
+
+		return shouldFail(adxExchange.refundBid(bidId, { from: acc }))
+	})
+
 	it("verify bid - should fail if not advertiser or publisher", function() {
 		return shouldFail(adxExchange.verifyBid(bidId, '0x22', { from: web3.eth.accounts[4] }))
 	})
