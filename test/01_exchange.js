@@ -146,7 +146,7 @@ contract('ADXExchange', function(accounts) {
 
 			r = '0x'+resp.substring(0, 64)
 			s = '0x'+resp.substring(64, 128)
-			v = parseInt(resp.substring(128, 130)) + 27
+			v = parseInt(resp.substring(128, 130), 16)
 		})
 	})
 
