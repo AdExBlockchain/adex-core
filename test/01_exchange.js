@@ -153,13 +153,13 @@ contract('ADXExchange', function(accounts) {
 	it("advertiser: cannot accept their own bid", function() {
 		var acc = accTwo
 
-		return shouldFail(adxExchange.acceptBid(acc, '0x1', bidOpened, 10000, 30, 0, '0x2', v, r, s, { from: acc }))
+		return shouldFail(adxExchange.acceptBid(acc, '0x1', bidOpened, 10000, 30, 0, '0x2', v, r, s, 1, { from: acc }))
 	})
 
 	it("publisher: cannot accept a bid with wrong data", function() {
 		var acc = accThree
 
-		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 50, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc }))
+		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 50, 0, '0x2', '0x'+v.toString(16), r, s, 1, { from: acc }))
 	})
 
 	it("publisher: can accept bid", function() {
@@ -168,8 +168,7 @@ contract('ADXExchange', function(accounts) {
 
 		var acc = accThree
 
-
-		return adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc })
+		return adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, 1, { from: acc })
 		.then(function(resp) {
 			var ev = resp.logs[0]
 			if (! ev) throw 'no event'
@@ -188,7 +187,7 @@ contract('ADXExchange', function(accounts) {
 	it("publisher: cannot accept a bid twice", function() {
 		var acc = accThree
 
-		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, { from: acc }))
+		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, 1, { from: acc }))
 	})
 
 	it("advertiser: cannot refundBid with 0 timeout", function() {
@@ -202,7 +201,7 @@ contract('ADXExchange', function(accounts) {
 	})
 
 	it("verify bid - publisher", function() {
-		adxExchange.verifyBid(bidId, '0x22', { from: accThree })
+		return adxExchange.verifyBid(bidId, '0x22', { from: accThree })
 		.then(function(resp) {
 			//console.log(resp)
 		})

@@ -89,20 +89,19 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	// 
 
 	// the bid is accepted by the publisher
-	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 r, bytes32 s)
+	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 r, bytes32 s, uint8 sigMode)
 		public
 	{
 		// It can be proven that onBids will never exceed balances which means this can't underflow
 		// SafeMath can't be used here because of the stack depth
-		uint available = balances[_advertiser] - onBids[_advertiser];
-		require(_amount <= available);
+		require(_amount <= (balances[_advertiser] - onBids[_advertiser]));
 
 		// _opened acts as a nonce here
 		bytes32 bidId = getBidID(_advertiser, _adunit, _opened, _target, _amount, _timeout);
 
 		require(bidStates[bidId] == BidState.DoesNotExist);
 
-		require(_advertiser == ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s));
+		require(didSign(_advertiser, bidId, v, r, s, sigMode));
 		
 		// advertier and publisher cannot be the same
 		require(_advertiser != msg.sender);
@@ -133,7 +132,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	}
 
 	// The bid is canceled by the advertiser
-	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, uint8 v, bytes32 r, bytes32 s)
+	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, uint8 v, bytes32 r, bytes32 s, uint8 sigMode)
 		public
 	{
 		// _opened acts as a nonce here
@@ -141,7 +140,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 
 		require(bidStates[bidId] == BidState.DoesNotExist);
 
-		require(msg.sender == ecrecover(keccak256("\x19Ethereum Signed Message:\n32", bidId), v, r, s));
+		require(didSign(msg.sender, bidId, v, r, s, sigMode));
 
 		bidStates[bidId] = BidState.Canceled;
 
@@ -230,6 +229,26 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 
 		balances[msg.sender] = SafeMath.sub(balances[msg.sender], _amount);
 		require(token.transfer(msg.sender, _amount));
+	}
+
+	// Internals
+
+	function didSign(address addr, bytes32 hash, uint8 v, bytes32 r, bytes32 s, uint8 mode)
+		internal
+		pure
+		returns (bool)
+	{
+		bytes32 message = hash;
+		
+		if (mode == 1) {
+			// Geth mode
+			message = keccak256("\x19Ethereum Signed Message:\n32", hash);
+		} else if (mode == 2) {
+			// Trezor mode
+			message = keccak256("\x19Ethereum Signed Message:\n\x20", hash);
+		}
+
+		return ecrecover(message, v, r, s) == addr;
 	}
 
 	//
