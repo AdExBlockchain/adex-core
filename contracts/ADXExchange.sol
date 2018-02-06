@@ -19,6 +19,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	mapping (bytes32 => Bid) bids;
 	mapping (bytes32 => BidState) bidStates;
 
+
 	enum BidState { 
 		DoesNotExist, // default state
 
@@ -58,6 +59,15 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		bytes32 advertiserConfirmation;
 	}
 
+	//
+	// Events
+	//
+	event LogBidAccepted(uint bidId, address advertiser, bytes32 adunit, address publisher, bytes32 adslot, uint acceptedTime);
+
+	event LogBidCanceled(uint bidId);
+	event LogBidExpired(uint bidId);
+	event LogBidCompleted(uint bidId, bytes32 advReport, bytes32 pubReport);
+	
 	//
 	// MODIFIERS
 	//
@@ -231,8 +241,9 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		require(token.transfer(msg.sender, _amount));
 	}
 
+	//
 	// Internals
-
+	//
 	function didSign(address addr, bytes32 hash, uint8 v, bytes32 r, bytes32 s, uint8 mode)
 		internal
 		pure
@@ -288,13 +299,4 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	{
 		return keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, this);
 	}
-
-	//
-	// Events
-	//
-	event LogBidAccepted(uint bidId, address advertiser, bytes32 adunit, address publisher, bytes32 adslot, uint acceptedTime);
-
-	event LogBidCanceled(uint bidId);
-	event LogBidExpired(uint bidId);
-	event LogBidCompleted(uint bidId, bytes32 advReport, bytes32 pubReport);
 }
