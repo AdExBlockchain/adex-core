@@ -16,8 +16,8 @@ do
 
 	./bundle.sh ./contracts/$contract.sol > $contract.sol
 	
-	solcjs --optimize --bin -o build-contract/final $contract.sol
-	solcjs --optimize --abi -o build-contract/final $contract.sol
+	solcjs --bin -o build-contract/final $contract.sol
+	solcjs --abi -o build-contract/final $contract.sol
 	
 	mv $contract.sol build-contract/bundled/$contract.sol
 done
