@@ -245,7 +245,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	// Internals
 	//
 	function didSign(address addr, bytes32 hash, uint8 v, bytes32 r, bytes32 s, uint8 mode)
-		internal
+		public
 		pure
 		returns (bool)
 	{
