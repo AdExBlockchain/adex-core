@@ -60,13 +60,15 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	}
 
 	// Schema hash 
+	// keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, this)
 	bytes32 constant public SCHEMA_HASH = keccak256(
 		"address Advertiser",
 		"bytes32 Ad Unit ID",
 		"uint Opened",
-		"uint Amount",
 		"uint Target",
-		"uint Timeout" 
+		"uint Amount",
+		"uint Timeout",
+		"address Exchange"
 	);
 
 
