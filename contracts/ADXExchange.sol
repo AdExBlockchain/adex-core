@@ -116,7 +116,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		public
 	{
 		require(_amount > 0);
-		
+
 		// It can be proven that onBids will never exceed balances which means this can't underflow
 		// SafeMath can't be used here because of the stack depth
 		require(_amount <= (balances[_advertiser] - onBids[_advertiser]));
@@ -215,6 +215,7 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	{
 		Bid storage bid = bids[_bidId];
 
+		require(_report != 0);
 		require(bid.publisher == msg.sender || bid.advertiser == msg.sender);
 
 		if (bid.publisher == msg.sender) {
