@@ -1,11 +1,11 @@
 pragma solidity ^0.4.18;
 
 import "../zeppelin-solidity/contracts/math/SafeMath.sol";
-import "./helpers/Drainable.sol";
 import "./ADXExchangeInterface.sol";
 import "../zeppelin-solidity/contracts/token/ERC20.sol";
+import "../zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract ADXExchange is ADXExchangeInterface, Drainable {
+contract ADXExchange is ADXExchangeInterface, Ownable {
 	string public name = "AdEx Exchange";
 
 	ERC20 public token;
@@ -19,6 +19,9 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	mapping (bytes32 => Bid) bids;
 	mapping (bytes32 => BidState) bidStates;
 
+	// accounted balances of any token
+	// currently we only use one token, but code is more intuitive like that
+	//mapping (address => uint) accounted;
 
 	enum BidState { 
 		DoesNotExist, // default state
@@ -252,6 +255,19 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 
 		balances[msg.sender] = SafeMath.sub(balances[msg.sender], _amount);
 		require(token.transfer(msg.sender, _amount));
+	}
+
+	// Note: it's not possible to send ETH to this contract, but it can end up wtih ETH 
+	//   if someone selfdestructs into this contract; unlikley
+	function withdrawToken(address tokenaddr, uint bal) 
+		onlyOwner
+		public
+	{
+		ERC20 tkn = ERC20(tokenaddr);
+		uint total = tkn.balanceOf(address(this));
+		//uint available = SafeMath.sub(total, accounted[tokenaddr]);
+		require(bal <= total);
+		tkn.transfer(msg.sender, bal);
 	}
 
 	//
