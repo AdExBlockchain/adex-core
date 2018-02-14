@@ -241,6 +241,19 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
+	it("can not send ether accidently", function() {
+		return new Promise((resolve, reject) => {
+			web3.eth.sendTransaction({
+				from: accOne,
+				to: adxExchange.address,
+				value: 2,
+				gas: 80000
+			}, (err) => {
+				assert.equal(err.message, 'VM Exception while processing transaction: invalid opcode')
+				resolve()
+			})
+		})
+	})
 
 	function shouldFail(promise)
 	{
