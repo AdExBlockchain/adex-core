@@ -102,6 +102,15 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
+	// withdraw()
+	it("withdraw(): cannot withdraw from another acc", function() {
+		var amnt = 10
+		var acc = web3.eth.accounts[4]
+
+		// first add +20 tokens to the exchange so we can try if we can over-withdraw
+		return shouldFail(adxExchange.withdraw(amnt, { from: acc }))
+	})
+
 	it("withdraw(): can withdraw our balance", function() {
 		var orgAmnt = 500
 		var amnt = 50
