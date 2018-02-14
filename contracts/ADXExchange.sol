@@ -115,6 +115,8 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 r, bytes32 s, uint8 sigMode)
 		public
 	{
+		require(_amount > 0);
+		
 		// It can be proven that onBids will never exceed balances which means this can't underflow
 		// SafeMath can't be used here because of the stack depth
 		require(_amount <= (balances[_advertiser] - onBids[_advertiser]));
