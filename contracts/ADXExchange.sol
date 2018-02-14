@@ -136,7 +136,8 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		bid.target = _target;
 		bid.amount = _amount;
 
-		bid.timeout = _timeout;
+		// it is pretty much mandatory for a bid to have a timeout, else tokens can be stuck forever
+		bid.timeout = _timeout > 0 ? _timeout : 24 hours;
 
 		bid.advertiser = _advertiser;
 		bid.adUnit = _adunit;
@@ -197,8 +198,8 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	{
 		Bid storage bid = bids[_bidId];
 
-		require(bid.timeout > 0); // you can't refund if you haven't set a timeout
-		require(now > SafeMath.add(bid.acceptedTime, bid.timeout)); // require that we're past the point of expiry
+ 		// require that we're past the point of expiry
+		require(now > SafeMath.add(bid.acceptedTime, bid.timeout));
 
 		bidStates[_bidId] = BidState.Expired;
 

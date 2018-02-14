@@ -199,7 +199,7 @@ contract('ADXExchange', function(accounts) {
 		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), r, s, 1, { from: acc }))
 	})
 
-	it("advertiser: cannot refundBid with 0 timeout", function() {
+	it("advertiser: cannot refundBid now", function() {
 		var acc = accTwo
 
 		return shouldFail(adxExchange.refundBid(bidId, { from: acc }))
@@ -254,6 +254,8 @@ contract('ADXExchange', function(accounts) {
 			})
 		})
 	})
+
+	// @TODO: refundBid test
 
 	function shouldFail(promise)
 	{
