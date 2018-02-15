@@ -182,7 +182,7 @@ contract('ADXExchange', function(accounts) {
 			var ev = resp.logs[0]
 			if (! ev) throw 'no event'
 
-			assert.equal(ev.event, "LogBidAccepted")
+			assert.equal(ev.event, 'LogBidAccepted')
 			assert.equal(ev.args.bidId, bidId)
 			assert.equal(ev.args.advertiser, accTwo)
 			assert.equal(ev.args.adunit, '0x1000000000000000000000000000000000000000000000000000000000000000')
@@ -256,6 +256,63 @@ contract('ADXExchange', function(accounts) {
 	})
 
 	// @TODO: refundBid test
+
+	it('publisher & advertiser: new bid, 0 timeout', function() {
+		var v, r, s
+		var acc = accThree
+
+		var bidOpened = Date.now()
+
+		return adxExchange.getBidID(accTwo, '0x1', bidOpened, 500, 5, 0)
+		.then(function(id) {
+			bidId = id
+			return web3.eth.sign(accTwo, id)
+		})
+		.then(function(resp) {
+			resp = resp.slice(2)
+
+			r = '0x'+resp.substring(0, 64)
+			s = '0x'+resp.substring(64, 128)
+			v = parseInt(resp.substring(128, 130), 16) + 27
+
+			return adxExchange.acceptBid(accTwo, '0x1', bidOpened, 500, 5, 0, '0x2', '0x'+v.toString(16), r, s, 1, { from: acc })
+		})
+		.then(function(resp) {
+			var ev = resp.logs[0]
+			if (! ev) throw 'no event'
+
+			assert.equal(ev.event, 'LogBidAccepted')
+			assert.equal(ev.args.bidId, bidId)
+			assert.equal(ev.args.advertiser, accTwo)
+			assert.equal(ev.args.adunit, '0x1000000000000000000000000000000000000000000000000000000000000000')
+			assert.equal(ev.args.publisher, accThree)
+			assert.equal(ev.args.adslot, '0x2000000000000000000000000000000000000000000000000000000000000000')
+			acceptedTime = ev.args.acceptedTime;
+			assert.equal(ev.args.acceptedTime.toNumber() > 1502219400, true) // just ensure the acceptedTime makes vague sense
+		})
+	})
+
+	it("advertiser: cannot refundBid now", function() {
+		var acc = accTwo
+
+		return shouldFail(adxExchange.refundBid(bidId, { from: acc }))
+	})
+
+	it("advertiser: can refundBid after more than 24 hours", function() {
+		return time.move(web3, 25 * 60 * 60 * 1000)
+		.then(function() {
+			return adxExchange.refundBid(bidId, { from: accTwo })
+		})
+		.then(function(resp) {
+			var ev = resp.logs[0]
+			if (! ev) throw 'no event'
+
+			assert.equal(ev.event, 'LogBidExpired')
+
+			// @TODO: test balances
+		})
+	})
+
 
 	function shouldFail(promise)
 	{
