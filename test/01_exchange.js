@@ -171,6 +171,12 @@ contract('ADXExchange', function(accounts) {
 		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 50, 0, '0x2', '0x'+v.toString(16), r, s, 1, { from: acc }))
 	})
 
+	it("publisher: cannot accept bid with wrong signatire", function() {
+		var acc = accThree
+
+		return shouldFail(adxExchange.acceptBid(accTwo, '0x1', bidOpened, 10000, 30, 0, '0x2', '0x'+v.toString(16), s, r, 1, { from: acc }))
+	})
+
 	it("publisher: can accept bid", function() {
 		// TODO: check for balances and etc (if they change)
 		// TODO: cannot accept a bid if the advertiser does not have the tokens
