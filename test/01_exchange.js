@@ -255,9 +255,7 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
-	// @TODO: refundBid test
-
-	it('publisher & advertiser: new bid, 0 timeout', function() {
+	it('advertiser and publisher: new bid, 0 timeout', function() {
 		var v, r, s
 		var acc = accThree
 
@@ -280,15 +278,7 @@ contract('ADXExchange', function(accounts) {
 		.then(function(resp) {
 			var ev = resp.logs[0]
 			if (! ev) throw 'no event'
-
 			assert.equal(ev.event, 'LogBidAccepted')
-			assert.equal(ev.args.bidId, bidId)
-			assert.equal(ev.args.advertiser, accTwo)
-			assert.equal(ev.args.adunit, '0x1000000000000000000000000000000000000000000000000000000000000000')
-			assert.equal(ev.args.publisher, accThree)
-			assert.equal(ev.args.adslot, '0x2000000000000000000000000000000000000000000000000000000000000000')
-			acceptedTime = ev.args.acceptedTime;
-			assert.equal(ev.args.acceptedTime.toNumber() > 1502219400, true) // just ensure the acceptedTime makes vague sense
 		})
 	})
 
@@ -313,6 +303,33 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
+	it('advertiser and publisher: cancel a bid', function() {
+		var v, r, s
+		var acc = accTwo
+
+		var bidOpened = Date.now()
+
+		return adxExchange.getBidID(acc, '0x1', bidOpened, 500, 5, 0)
+		.then(function(id) {
+			bidId = id
+			return web3.eth.sign(acc, id)
+		})
+		.then(function(resp) {
+			resp = resp.slice(2)
+
+			r = '0x'+resp.substring(0, 64)
+			s = '0x'+resp.substring(64, 128)
+			v = parseInt(resp.substring(128, 130), 16) + 27
+
+			return adxExchange.cancelBid('0x1', bidOpened, 500, 5, 0, '0x'+v.toString(16), r, s, 1, { from: acc })
+		})
+		.then(function(resp) {
+			var ev = resp.logs[0]
+			if (! ev) throw 'no event'
+
+			assert.equal(ev.event, 'LogBidCanceled')
+		})
+	})
 
 	function shouldFail(promise)
 	{
