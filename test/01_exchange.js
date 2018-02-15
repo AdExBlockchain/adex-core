@@ -299,7 +299,7 @@ contract('ADXExchange', function(accounts) {
 	})
 
 	it("advertiser: can refundBid after more than 24 hours", function() {
-		return time.move(web3, 25 * 60 * 60 * 1000)
+		return time.move(web3, 365 * 24 * 60 * 60 + 10)
 		.then(function() {
 			return adxExchange.refundBid(bidId, { from: accTwo })
 		})

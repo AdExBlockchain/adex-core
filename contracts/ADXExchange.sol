@@ -10,6 +10,8 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 
 	ERC20 public token;
 
+	uint public maxTimeout = 365 days;
+
  	mapping (address => uint) balances;
 
  	// escrowed on bids
@@ -137,7 +139,8 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		bid.amount = _amount;
 
 		// it is pretty much mandatory for a bid to have a timeout, else tokens can be stuck forever
-		bid.timeout = _timeout > 0 ? _timeout : 24 hours;
+		bid.timeout = _timeout > 0 ? _timeout : maxTimeout;
+		require(bid.timeout <= maxTimeout);
 
 		bid.advertiser = _advertiser;
 		bid.adUnit = _adunit;
