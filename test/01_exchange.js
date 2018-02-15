@@ -331,6 +331,33 @@ contract('ADXExchange', function(accounts) {
 		})
 	})
 
+
+	// didSign tests
+	var trezorSignedMsg = {
+		"address": "0x7c72e5f169dfcff2293f4690c366ccd107eddfcd",
+		"msg": "adex adex adex adex adex adex ad",
+		"sig": "0xb9c3dfe8386e67036c139f434fa32017576781e9d1277e436ace887480128e1062611ec535e4ee4c2758930f09efa98e18a45c0013ce26ae3911afdbc86ba9d11c",
+	}
+
+	it('didSign should work with a trezor sig', function() {
+		var r, s, v
+		var sig = trezorSignedMsg.sig
+		
+		sig = sig.slice(2)
+		r = '0x'+sig.substring(0, 64)
+		s = '0x'+sig.substring(64, 128)
+		v = parseInt(sig.substring(128, 130), 16) // in trezor's case, there is no +27
+
+		var msg = '0x'+(new Buffer(trezorSignedMsg.msg)).toString('hex')
+
+		return adxExchange.didSign(trezorSignedMsg.address, msg, v, r, s, 2)
+		.then(function(resp) {
+			assert.equal(resp, true)
+		})
+	})
+
+
+
 	function shouldFail(promise)
 	{
 		return new Promise(function(resolve, reject) {
