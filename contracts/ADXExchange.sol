@@ -261,9 +261,6 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		require(token.transfer(msg.sender, _amount));
 	}
 
-	//
-	// Internals
-	//
 	function didSign(address addr, bytes32 hash, uint8 v, bytes32 r, bytes32 s, uint8 mode)
 		public
 		pure
