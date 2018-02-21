@@ -73,16 +73,6 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 		"address Exchange"
 	);
 
-
-	//
-	// Events
-	//
-	event LogBidAccepted(uint bidId, address advertiser, bytes32 adunit, address publisher, bytes32 adslot, uint acceptedTime);
-
-	event LogBidCanceled(uint bidId);
-	event LogBidExpired(uint bidId);
-	event LogBidCompleted(uint bidId, bytes32 advReport, bytes32 pubReport);
-	
 	//
 	// MODIFIERS
 	//
