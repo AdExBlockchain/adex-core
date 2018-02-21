@@ -229,10 +229,8 @@ contract('ADXExchange', function(accounts) {
 			return adxExchange.verifyBid(bidId, '0x23', { from: accTwo })
 		})
 		.then(function(resp) {
-			var ev = resp.logs[0]
+			var ev = resp.logs.filter(function(x) { return x.event == 'LogBidCompleted' })
 			if (! ev) throw 'no event'
-
-			assert.equal(ev.event, "LogBidCompleted")
 
 			return adxExchange.getBalance(accThree)
 		})

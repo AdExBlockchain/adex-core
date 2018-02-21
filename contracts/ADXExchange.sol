@@ -232,6 +232,8 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 			bid.advertiserConfirmation = _report;
 		}
 
+		LogBidConfirmed(_bidId, msg.sender, _report);
+
 		if (bid.advertiserConfirmation != 0 && bid.publisherConfirmation != 0) {
 			bidStates[_bidId] = BidState.Completed;
 
