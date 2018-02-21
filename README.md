@@ -16,7 +16,7 @@ yarn test
 
 ```
 
-## Components in mainnet
+## Components in mainnet (v1)
 
 ``adex-token.eth`` - ERC20 token of AdEx
 
