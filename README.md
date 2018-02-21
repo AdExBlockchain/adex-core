@@ -16,13 +16,13 @@ yarn test
 
 ```
 
-## Components in mainnet (v1)
+## Components in mainnet
 
 ``adex-token.eth`` - ERC20 token of AdEx
 
-``adex-registry.eth`` - the registry contract of AdEx - handles accounts, ad units, ad slots and others
-
 ``adex-exchange.eth`` - the on-chain advertising exchange
+
+**NOTICE: adex-exchange is currently running the v1 contracts. It will soon be updated to v2**
 
 ## NEO Port
 
