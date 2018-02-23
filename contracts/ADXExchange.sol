@@ -241,6 +241,8 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	{
 		balances[msg.sender] = SafeMath.add(balances[msg.sender], _amount);
 		require(token.transferFrom(msg.sender, address(this), _amount));
+
+		LogDeposit(msg.sender, _amount);
 	}
 
 	function withdraw(uint _amount)
@@ -251,6 +253,8 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 
 		balances[msg.sender] = SafeMath.sub(balances[msg.sender], _amount);
 		require(token.transfer(msg.sender, _amount));
+
+		LogWithdrawal(msg.sender, _amount);
 	}
 
 	function didSign(address addr, bytes32 hash, uint8 v, bytes32 r, bytes32 s, uint8 mode)

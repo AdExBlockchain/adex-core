@@ -8,6 +8,9 @@ contract ADXExchangeInterface {
 	event LogBidConfirmed(bytes32 bidId, address advertiserOrPublisher, bytes32 report);
 	event LogBidCompleted(bytes32 bidId, bytes32 advReport, bytes32 pubReport);
 
+	event LogDeposit(address _user, uint _amnt);
+	event LogWithdrawal(address _user, uint _amnt);
+
 	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 r, bytes32 s, uint8 sigMode) public;
 	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, uint8 v, bytes32 r, bytes32 s, uint8 sigMode) public;
 	function giveupBid(bytes32 _bidId) public;
