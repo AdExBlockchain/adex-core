@@ -2,11 +2,22 @@ var ADXExchange = artifacts.require("./ADXExchange.sol");
 var ADXMock = artifacts.require("./ADXMock.sol"); // adx mock token
 var Promise = require('bluebird')
 var time = require('../helpers/time')
+var web3Utils = require('web3-utils')
 
 contract('ADXExchange', function(accounts) {
 	var accOne = web3.eth.accounts[0]
 	var accTwo = web3.eth.accounts[1] // advertiser
 	var accThree = web3.eth.accounts[2] // publisher
+
+	var SCHEMA = ["address Advertiser",
+		"bytes32 Ad Unit ID",
+		"uint Opened",
+		"uint Target",
+		"uint Amount",
+		"uint Timeout",
+		"address Exchange"]
+
+	var schemaHash = web3Utils.soliditySha3.apply(web3Utils, SCHEMA)
 
 	// PLAN: 
 
@@ -144,18 +155,25 @@ contract('ADXExchange', function(accounts) {
 	it("advertiser: sign a bid", function() {
 		var acc = accTwo
 
-		// NOTE: not needed to use the SC to get the bid ID, we can do soliditySha3(..., adxExchange.address) too
-		return adxExchange.getBidID(acc, '0x1', bidOpened, 10000, 30, 0)
-		.then(function(id) {
-			bidId = id
-			return web3.eth.sign(acc, id)
-		})
-		.then(function(resp) {
-			resp = resp.slice(2)
+		var valHash = web3Utils.soliditySha3(acc, '0x1000000000000000000000000000000000000000000000000000000000000000', bidOpened, 10000, 30, 0, adxExchange.address)
+		var id = web3Utils.soliditySha3(schemaHash, valHash)
 
-			r = '0x'+resp.substring(0, 64)
-			s = '0x'+resp.substring(64, 128)
-			v = parseInt(resp.substring(128, 130), 16) + 27
+		bidId = id
+		
+		return new Promise(function(resolve, reject) {
+			web3.eth.sign(acc, id, function(err, resp) {
+				if (err) return reject(err)
+
+				resp = resp.slice(2)
+
+				r = '0x'+resp.substring(0, 64)
+				s = '0x'+resp.substring(64, 128)
+				v = parseInt(resp.substring(128, 130), 16) + 27
+
+				resolve()
+
+			})
+
 		})
 	})
 

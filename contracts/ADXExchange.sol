@@ -310,7 +310,9 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	{
 		return keccak256(
 			SCHEMA_HASH,
-			keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, this)
+			keccak256(_advertiser, _adunit, _opened, _target, _amount, _timeout, address(this))
 		);
 	}
+
+
 }
