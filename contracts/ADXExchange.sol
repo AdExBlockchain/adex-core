@@ -151,15 +151,13 @@ contract ADXExchange is ADXExchangeInterface, Drainable {
 	}
 
 	// The bid is canceled by the advertiser
-	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout, uint8 v, bytes32 r, bytes32 s, uint8 sigMode)
+	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _amount, uint _timeout)
 		public
 	{
 		// _opened acts as a nonce here
 		bytes32 bidId = getBidID(msg.sender, _adunit, _opened, _target, _amount, _timeout);
 
 		require(bidStates[bidId] == BidState.DoesNotExist);
-
-		require(didSign(msg.sender, bidId, v, r, s, sigMode));
 
 		bidStates[bidId] = BidState.Canceled;
 

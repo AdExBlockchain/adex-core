@@ -12,7 +12,7 @@ contract ADXExchangeInterface {
 	event LogWithdrawal(address _user, uint _amnt);
 
 	function acceptBid(address _advertiser, bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, bytes32 _adslot, uint8 v, bytes32 r, bytes32 s, uint8 sigMode) public;
-	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout, uint8 v, bytes32 r, bytes32 s, uint8 sigMode) public;
+	function cancelBid(bytes32 _adunit, uint _opened, uint _target, uint _rewardAmount, uint _timeout) public;
 	function giveupBid(bytes32 _bidId) public;
 	function refundBid(bytes32 _bidId) public;
 	function verifyBid(bytes32 _bidId, bytes32 _report) public;

@@ -337,7 +337,7 @@ contract('ADXExchange', function(accounts) {
 			s = '0x'+resp.substring(64, 128)
 			v = parseInt(resp.substring(128, 130), 16) + 27
 
-			return adxExchange.cancelBid('0x1', bidOpened, 500, 5, 0, '0x'+v.toString(16), r, s, 1, { from: acc })
+			return adxExchange.cancelBid('0x1', bidOpened, 500, 5, 0, { from: acc })
 		})
 		.then(function(resp) {
 			var ev = resp.logs[0]
