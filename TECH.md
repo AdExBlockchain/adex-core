@@ -29,9 +29,9 @@ We call the critical set of smart contracts that facilitate the most important i
 
 ## Level two
 
-For later generations of the core, there's the posibility of adding off-chain solutions that supplement the main smart contracts, for example an IOTA-based solution that will handle real-time bidding and commit the overall results to the ethereum blockchain (`ADXRealTimeBiddingExchange`) - therefore replacing the current off-chain hyperlog-based solution.
+For later generations of the core, there's the posibility of adding off-chain solutions that supplement the main smart contracts, for example a layer 2 solution that will handle real-time bidding and commit the overall results to the ethereum blockchain (`ADXRealTimeBiddingExchange`) - therefore replacing the current off-chain hyperlog-based solution.
 
-Possible level two solutions: IOTA, TrueBit, polkadot
+Possible level two solutions: TrueBit, polkadot
 
 ## Ports
 
@@ -140,7 +140,7 @@ Even though you can technically manipulate the statistical data (e.g.  details a
 
 This is very similar to the concept of Ethereum state channels described by Stephan Tual in his blog (https://blog.stephantual.com/what-are-state-channels-32a81f7accab).
 
-For now, off-chain data is kept in a peer-to-peer multi-master-replication database, but if a technology that allows some further verification/confirmation of the data emerges, while still being scalable enough, for example IOTA or BigchainDB, it can be used instead.
+For now, off-chain data is kept in a peer-to-peer multi-master-replication database, but if a technology that allows some further verification/confirmation of the data emerges, while still being scalable enough, for example BigchainDB, it can be used instead.
 
 Because of the potential inconsistency with that kind of off-chain DBs, the AdEx core will allow certain margin of error for archieving the overall goals (accepted bids), so as to still allow verification of the goal achievement even if some small data points are lost. The advertiser will be able to set the accepted margin of error, and to prevent fraud by exploiting the limits of the margin of error, the exact number will be logged to the blockchain - if an advertiser decides that a publisher is consistently arriving at the upper-bound of the allowed margin of error, they can opt out of working with them.
 
