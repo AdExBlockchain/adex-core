@@ -1,6 +1,6 @@
 # AdEx Core
 
-This repository contains the Ethereum-based core of the AdEx Network. This includes facilitating registering publishers, advertisers and the exchange that allows them to bid and pay to each other.
+This repository contains the Ethereum-based core of the AdEx Network, written in Solidity. This includes facilitating registering publishers, advertisers and the exchange that allows them to bid and pay to each other.
 
 ## Instructions
 
@@ -16,7 +16,7 @@ yarn test
 
 ```
 
-## Components in mainnet
+## Components on mainnet
 
 ``adex-token.eth`` - ERC20 token of AdEx
 
