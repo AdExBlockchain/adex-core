@@ -24,9 +24,9 @@ yarn test
 
 **NOTICE: adex-exchange is currently running the v1 contracts. It will soon be updated to v2**
 
-## NEO Port
+## Ports
 
-This repository, namely the ADXRegistry and ADXExchange smart contracts will be ported the [NEO Smart Economy](https://neo.org) (see [Smart Contract docs](http://docs.neo.org/en-us/sc/introduction.html)). We consider NEO to be a great alternative to Ethereum because of the smart contract system that allows more stable languages such as C# to be used for writing smart contracts, and the general engineering direction of the project.
+This repository, namely the ADXExchange smart contract might be ported to other blockchains that support smart contracts in a way similar to Ethereum. The considered platforms at the moment are Ethermint (see https://github.com/AdExNetwork/adex-core/issues/12), RSK and NEO.
 
 The AdEx Core will still be available and maintained for Ethereum.
 
