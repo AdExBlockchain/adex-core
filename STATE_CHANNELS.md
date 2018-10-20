@@ -1,5 +1,6 @@
+# OBSOLETE; move over to https://github.com/adexnetwork/adex-protocol
 
-# AdEx State channels:
+# AdEx Off-chain scaling:
 
 In the browser, the user generates an identity (if they don't have one) and they generate an event looking like:
 ```
