@@ -1,3 +1,7 @@
+# OBSOLETE
+
+## MOVED TO [adex-protocol-eth](http://github.com/adexnetwork/adex-protocol-eth)
+
 # AdEx Core
 
 This repository contains the Ethereum-based core of the AdEx Network, written in Solidity. This includes facilitating registering publishers, advertisers and the exchange that allows them to bid and pay to each other.
